@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($rootScope, $scope, $sce, $timeout, $location, $log, $window, spUtil, spNavStateManager) {
+	/* widget controller */	
+	var c = this;
+
+	$scope.submitting = false;
+	$scope.mandatory = [];
+	$scope.errorMessages = [];
+  
+  
+} ]]></client_script>
+        <controller_as>c</controller_as>
+        <css>iframe#simulated_html_iframe {
+    width: 100%;
+    min-height: 40vh;
+    height: max-content;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>mag_notif_preview</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
+        <name>MAG Notif Preview</name>
+        <option_schema/>
+        <public>false</public>
+        <roles/>
+        <script><![CDATA[// form functionality - URL parameter driven
+(function($sp, input, data, options, gs) {
+	/* "use strict"; -linter issues */
+	
+	
+	
+	///////////////////////////////////
+	// Pre-populate the 'data' variable
+	///////////////////////////////////
+	data.f = {};
+	data.recordAddedMsg = gs.getMessage("Record Added");
+	data.updatedMsg = gs.getMessage("updated_uppercase");
+	data.process_msg = "Data obj2 Initialized";
+
+	
+	data.table = data.table || $sp.getParameter("t") || $sp.getParameter("table") || $sp.getParameter("sl_table") || options.table;
+	data.sys_id = data.sys_id || $sp.getParameter("sys_id") || $sp.getParameter("sl_sys_id") || options.sys_id;
+	if (!data.sys_id && options.sys_id_required != "true")
+		data.sys_id = "-1";
+	data.view = options.view || $sp.getParameter("view") || $sp.getParameter("v"); // no default
+
+	
+	
+	
+	
+
+	///////////////////////////////////
+	// Generate values for the Preview (ToDo!)
+	///////////////////////////////////
+	
+	data.preview_record = "1c741bd70b2322007518478d83673af3";
+//	data.preview_record = new GlideRecord(...) // orderByDesc updated
+	
+	data.preview_event = "";
+//	data.preview_event = new GlideRecord(...) // orderByDesc updated
+	
+	
+	
+	var sys_id_str = (data.sys_id || "").toString();
+	if (sys_id_str.match(/^\w{32}$/) != null) {
+		data.isTargetValid = true;
+		data.preview_url =
+			"notification_preview_html_body.do?sysparm_record_id="
+			+ data.preview_record
+			+ "&sysparm_user_id=" + "6816f79cc0a8016401c5a33be04be441"
+			+ "&sysparm_event_id=" + data.preview_event
+			+ "&sysparm_notification_id=" + data.sys_id
+			+ "&sysparm_changed_fields="
+			+ "&sys_target=sysevent_email_action"
+			+ "&sys_uniqueValue=" + data.sys_id;
+
+
+	}
+})($sp, input, data, options, gs);]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-04-21 18:06:30</sys_created_on>
+        <sys_id>f9f20bf1db5850108599656b4b9619ac</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>MAG Notif Preview</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sp_widget_f9f20bf1db5850108599656b4b9619ac</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-04-28 21:18:38</sys_updated_on>
+        <template><![CDATA[<div>
+  
+
+  <!--
+// TODO: On SUBJECT preview: Replace /${(w+)}/ for data.f._fields[(1)}
+// Can use a pipe directive for this! :)input._fields
+-->
+  <section id="contentPreviewArea" ng-if="data.preview_url">
+
+    <iframe src="{{data.preview_url}}"
+            id="simulated_html_iframe"
+            title="HTML Body Preview">
+    </iframe>
+
+  </section>
+
+</div>
+
+
+
+
+  <!--
+.../notification_preview_html_body.do?
+sysparm_record_id=1c741bd70b2322007518478d83673af3
+&sysparm_user_id=6816f79cc0a8016401c5a33be04be441
+&sysparm_event_id=
+&sysparm_notification_id=24e34b54c61122aa0108c1b7a33697cf
+&sysparm_changed_fields=
+&sys_target=sysevent_email_action
+&sys_uniqueValue=24e34b54c61122aa0108c1b7a33697cf
+&sys_row=0
+&sysparm_encoded_record=
+-->
+
+]]></template>
+    </sp_widget>
+</record_update>
