@@ -413,6 +413,12 @@
 
 }
 
+
+
+	//////////////////////////////////////
+	/// Local function Declarations
+	//////////////////////////////////////
+
 var localFunctions = {
 	setAllWatchers: function($scope, spUtil, table, filter){
 		// TODO: set the 	$rootScope.data.main_filter = $scope.data.filter;
@@ -472,122 +478,152 @@ var localFunctions = {
 			}
 		}
 	}
-}]]></client_script>
+};
+
+
+]]></client_script>
         <controller_as>c</controller_as>
-        <css>.panel-heading {&#13;
-  padding-left: 8px;&#13;
-}&#13;
-&#13;
-thead {&#13;
-  border-bottom: 1px solid #ddd;&#13;
-}&#13;
-&#13;
-table {&#13;
-  margin-bottom: 0;&#13;
-&#13;
-&#13;
-  // MAG-List hover effect&#13;
-  tbody&gt;tr:hover {&#13;
-    text-shadow: 0 0 2px #293e40;&#13;
-  }&#13;
-&#13;
-  .selected {&#13;
-  }&#13;
-&#13;
-}&#13;
-&#13;
-&#13;
-// MAG-List outter style&#13;
-.panel.panel-default.b, .panel.panel-default.b&gt;div {&#13;
-  margin: 1em;&#13;
-  border-radius: 2em;&#13;
-}&#13;
-&#13;
-&#13;
-.panel.panel-default.b {&#13;
-  box-shadow: -2px -2px 20px -10px black;&#13;
-}&#13;
-&#13;
-&#13;
-&#13;
-.table &gt; thead &gt; tr &gt; th {&#13;
-  border: 1px solid #ddd;&#13;
-  cursor: pointer;&#13;
-  vertical-align: middle;&#13;
-&#13;
-  &amp;:nth-child(2) {&#13;
-    border-left: none;&#13;
-  }&#13;
-&#13;
-&#13;
-&#13;
-  &amp;:last-child {&#13;
-    border-right: none;&#13;
-  }&#13;
-}&#13;
-&#13;
-th i {&#13;
-  display: inline-block;&#13;
-  margin-left: 5px;&#13;
-  color: #A0A0A0;&#13;
-}&#13;
-&#13;
-th .disabled{&#13;
-  color:#ddd;&#13;
-}&#13;
-&#13;
-.th-title {&#13;
-  display: inline-block;&#13;
-  color: $primary;&#13;
-}&#13;
-&#13;
-.panel-body {&#13;
-  overflow: auto;&#13;
-  padding: 0px;&#13;
-}&#13;
-&#13;
-&#13;
-.selected {&#13;
-  color: #fff;&#13;
-  background-color: $data-table-selected;&#13;
-  border-color: 1px solid #fff;&#13;
-}&#13;
-&#13;
-tbody tr:last-child {&#13;
-  border-bottom: none;&#13;
-}&#13;
-&#13;
-.pruned-msg {&#13;
-  padding-bottom: 10px;&#13;
-  padding-left: 4px;&#13;
-  text-align: center;&#13;
-}&#13;
-&#13;
-.pruned-msg-filter-pad {&#13;
-  padding-top:8px;&#13;
-}&#13;
-&#13;
-.filter-breadcrumbs {&#13;
-  border-bottom: 1px solid #ddd;&#13;
-  padding-top: 3px;&#13;
-}&#13;
-&#13;
-.dropdown-toggle {&#13;
-  background: none;&#13;
-  padding: 0 0 4px 0;&#13;
-}&#13;
-&#13;
-.sp-list-cell {&#13;
-  white-space: pre-wrap;&#13;
-}&#13;
-&#13;
-.dropdown {&#13;
-  .glyphicon-menu-hamburger:focus {&#13;
- 		outline: thin dotted;&#13;
-		outline: 5px auto $input-border-focus;&#13;
-		outline-offset: -2px; &#13;
-	}&#13;
-}</css>
+        <css>.panel-heading {
+  padding-left: 8px;
+}
+
+thead {
+  border-bottom: 1px solid #ddd;
+}
+
+table {
+  margin-bottom: 0;
+
+
+  // MAG-List hover effect
+  tbody&gt;tr:hover {
+    text-shadow: 0 0 2px #293e40;
+  }
+
+  .selected {
+  }
+
+}
+
+
+// MAG-List outter style
+.panel.panel-default.b, .panel.panel-default.b&gt;div {
+  margin: 1em;
+  border-radius: 2em;
+}
+
+
+.panel.panel-default.b {
+  box-shadow: -2px -2px 20px -10px black;
+}
+
+
+
+.table &gt; thead &gt; tr &gt; th {
+  border: 1px solid #ddd;
+  cursor: pointer;
+  vertical-align: middle;
+
+  &amp;:nth-child(2) {
+    border-left: none;
+  }
+
+
+
+  &amp;:last-child {
+    border-right: none;
+  }
+}
+
+th i {
+  display: inline-block;
+  margin-left: 5px;
+  color: #A0A0A0;
+}
+
+th .disabled{
+  color:#ddd;
+}
+
+.th-title {
+  display: inline-block;
+  color: $primary;
+}
+
+.panel-body {
+  overflow: auto;
+  padding: 0px;
+}
+
+
+.selected {
+  color: #fff;
+  background-color: $data-table-selected;
+  border-color: 1px solid #fff;
+}
+
+tbody tr:last-child {
+  border-bottom: none;
+}
+
+.pruned-msg {
+  padding-bottom: 10px;
+  padding-left: 4px;
+  text-align: center;
+}
+
+.pruned-msg-filter-pad {
+  padding-top:8px;
+}
+
+.filter-breadcrumbs {
+  border-bottom: 1px solid #ddd;
+  padding-top: 3px;
+}
+
+.dropdown-toggle {
+  background: none;
+  padding: 0 0 4px 0;
+}
+
+.sp-list-cell {
+  white-space: pre-wrap;
+}
+
+.dropdown {
+  .glyphicon-menu-hamburger:focus {
+ 		outline: thin dotted;
+		outline: 5px auto $input-border-focus;
+		outline-offset: -2px; 
+	}
+}
+
+
+// MAG Header integrated button
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+    vertical-align: middle;
+}
+
+.icon-arrow-down-triangle:before {
+    content: "\f111";
+  // "\f125" &gt;&gt; w/ the squares
+}
+
+[class^="icon-"]:before, [class*=" icon-"]:before {
+    font-family: "retina_icons";
+    display: inline-block;
+    line-height: 1;
+    font-weight: normal;
+    font-style: normal;
+    speak: none;
+    text-decoration: inherit;
+    text-transform: none;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+</css>
         <data_table>sp_instance_table</data_table>
         <demo_data>{"data":
 	{
@@ -742,126 +778,150 @@ tbody tr:last-child {&#13;
         <roles/>
         <script><![CDATA[(function($sp, input, data, options, gs) { // $sp, input, data, options, gs
 	
-	processExtended();
-	
-	
-	if (!input) // asynch load list
-		return;
 
-	
-	// Here's the main record query
-	var grForMetaData = new GlideRecord(data.table);
-	var gr;
-	// FilteredGlideRecord is not supported in scoped apps, so GlideRecordSecure will always be used in an application scope
-	if (typeof FilteredGlideRecord != "undefined" && (gs.getProperty("glide.security.ui.filter") == "true" || grForMetaData.getAttribute("glide.security.ui.filter") != null)) {
-		gr = new FilteredGlideRecord(data.table);
-		gr.applyRowSecurity();
-	} else
-		gr = new GlideRecordSecure(data.table);
-	if (!gr.isValid()) {
-		data.invalid_table = true;
-		data.table_label = data.table;
-		return;
-	}
+	try {
+		initializeDataObj();
 
-	data.canCreate = gr.canCreate();
-	data.newButtonUnsupported = data.table == "sys_attachment";
-	data.hasTextIndex = $sp.hasTextIndex(data.table);
-	if (data.filter) {
-		if (data.filterACLs)
-			gr = $sp.addQueryString(gr, data.filter);
+	//temp
+	data.trigger_table = "Incident";
+
+		////////////////////////////////////////
+		// Deal w/ input, if any
+		////////////////////////////////////////
+
+		if (!input || input == {}) // asynch load list
+			return;
+
+
+
+
+		////////////////////////////////////////
+		// Setup the record and the query
+		////////////////////////////////////////
+		var grForMetaData = new GlideRecord(data.table);
+		var gr;
+
+		// FilteredGlideRecord is not supported in scoped apps, so GlideRecordSecure will always be used in an application scope
+		if (typeof FilteredGlideRecord != "undefined" && (gs.getProperty("glide.security.ui.filter") == "true" || grForMetaData.getAttribute("glide.security.ui.filter") != null)) {
+			gr = new FilteredGlideRecord(data.table);
+			gr.applyRowSecurity();
+		} else
+			gr = new GlideRecordSecure(data.table);
+
+
+
+		if (!gr.isValid()) {
+			data.invalid_table = true;
+			data.table_label = data.table;
+			return;
+		}
+
+		data.canCreate = gr.canCreate();
+		data.newButtonUnsupported = data.table == "sys_attachment";
+		data.hasTextIndex = $sp.hasTextIndex(data.table);
+		if (data.filter) {
+			if (data.filterACLs)
+				gr = $sp.addQueryString(gr, data.filter);
+			else
+				gr.addEncodedQuery(data.filter);
+		}
+		if (data.keywords) {
+			gr.addQuery('123TEXTQUERY321', data.keywords);
+			data.keywords = null;
+		}
+
+		data.filter = gr.getEncodedQuery();
+		if (data.trigger_table)
+			data.filter = "collection=" + data.trigger_table + "^" + gr.getEncodedQuery();
+
+
+		if (data.relationship_id) {
+			var rel = GlideRelationship.get(data.relationship_id);
+			var target = new GlideRecord(data.table);
+			var applyTo = new GlideRecord(data.apply_to);
+			applyTo.get("sys_id", data.apply_to_sys_id);
+			rel.queryWith(applyTo, target); // put the relationship query into target
+			data.exportQuery = target.getEncodedQuery();
+			gr.addEncodedQuery(data.exportQuery); // get the query the relationship made for us
+		}
+		if (data.exportQuery)
+			data.exportQuery += '^' + data.filter;
 		else
-			gr.addEncodedQuery(data.filter);
-	}
-	if (data.keywords) {
-		gr.addQuery('123TEXTQUERY321', data.keywords);
-		data.keywords = null;
-	}
+			data.exportQuery = data.filter;
+		data.exportQueryEncoded = encodeURIComponent(data.exportQuery);
+		if (data.o){
+			if (data.d == "asc")
+				gr.orderBy(data.o);
+			else
+				gr.orderByDesc(data.o);
+			if (gs.getProperty("glide.secondary.query.sysid") == "true")
+				gr.orderBy("sys_id");
+		}
+		gr.chooseWindow(data.window_start, data.window_end);
+		gr._query();
 
-	data.filter = gr.getEncodedQuery();
+		data.row_count = gr.getRowCount();
+		data.num_pages = Math.ceil(data.row_count / data.window_size);
 
-	if (data.relationship_id) {
-		var rel = GlideRelationship.get(data.relationship_id);
-		var target = new GlideRecord(data.table);
-		var applyTo = new GlideRecord(data.apply_to);
-		applyTo.get("sys_id", data.apply_to_sys_id);
-		rel.queryWith(applyTo, target); // put the relationship query into target
-		data.exportQuery = target.getEncodedQuery();
-		gr.addEncodedQuery(data.exportQuery); // get the query the relationship made for us
-	}
-	if (data.exportQuery)
-		data.exportQuery += '^' + data.filter;
-	else
-		data.exportQuery = data.filter;
-	data.exportQueryEncoded = encodeURIComponent(data.exportQuery);
-	if (data.o){
-		if (data.d == "asc")
-			gr.orderBy(data.o);
-		else
-			gr.orderByDesc(data.o);
-		if (gs.getProperty("glide.secondary.query.sysid") == "true")
-			gr.orderBy("sys_id");
-	}
-	gr.chooseWindow(data.window_start, data.window_end);
-	gr._query();
+		data.list = [];
+		while (gr._next()) {
+			var record = {};
+			$sp.getRecordElements(record, gr, data.fields);
+			if (typeof FilteredGlideRecord != "undefined" && gr instanceof FilteredGlideRecord) {
+				// FilteredGlideRecord doesn't do field-level
+				// security, so take care of that here
+				for (var f in data.fields_array) {
+					var fld = data.fields_array[f];
+					if (!gr.isValidField(fld))
+						continue;
 
-	data.row_count = gr.getRowCount();
-	data.num_pages = Math.ceil(data.row_count / data.window_size);
-
-	data.list = [];
-	while (gr._next()) {
-		var record = {};
-		$sp.getRecordElements(record, gr, data.fields);
-		if (typeof FilteredGlideRecord != "undefined" && gr instanceof FilteredGlideRecord) {
-			// FilteredGlideRecord doesn't do field-level
-			// security, so take care of that here
-			for (var f in data.fields_array) {
-				var fld = data.fields_array[f];
-				if (!gr.isValidField(fld))
-					continue;
-
-				if (!gr[fld].canRead()) {
-					record[fld].value = null;
-					record[fld].display_value = null;
+					if (!gr[fld].canRead()) {
+						record[fld].value = null;
+						record[fld].display_value = null;
+					}
 				}
 			}
+			record.sys_id = gr.getValue('sys_id');
+			record.targetTable = gr.getRecordClassName();
+			data.list.push(record);
 		}
-		record.sys_id = gr.getValue('sys_id');
-		record.targetTable = gr.getRecordClassName();
-		data.list.push(record);
+
+		data.enable_filter = (input.enable_filter == true || input.enable_filter == "true" ||
+													options.enable_filter == true || options.enable_filter == "true");
+		var breadcrumbWidgetParams = {
+			table: data.table,
+			query: data.filter,
+			enable_filter: data.enable_filter
+		};
+		data.filterBreadcrumbs = $sp.getWidget('widget-filter-breadcrumbs', breadcrumbWidgetParams);
+
+	}
+	catch(main_err) {
+		gs.error("NOTIFs Widget::ListView: " + main_err.name + " \n >> " + main_err.message);
 	}
 
-	data.enable_filter = (input.enable_filter == true || input.enable_filter == "true" ||
-		options.enable_filter == true || options.enable_filter == "true");
-	var breadcrumbWidgetParams = {
-		table: data.table,
-		query: data.filter,
-		enable_filter: data.enable_filter
-	};
-	data.filterBreadcrumbs = $sp.getWidget('widget-filter-breadcrumbs', breadcrumbWidgetParams);
 
-	
-	
-	
+
+
+
+
 	//////////////////////////////////////
 	/// Local function Declarations
 	//////////////////////////////////////
-	
-	
-	
+
+
 	// copy to data[name] from input[name] || option[name]
 	function optCopy(names) {
 		input = input || {}; // TODO: Revisit this; using input generically but unable to tell if there is actual input
 		options = options || {};
 		names.forEach(function(name) {
-			data[name] = input[name] || options[name] || data[name];
+			data[name] = input[name] || data[name] || options[name];
 		})
 	}
-	
-	
 
 
-	function processExtended() {
+
+	function initializeDataObj() {
 		/*  "use strict"; - linter issues */	
 		/*
 	 ******* Populate the DATA object ********
@@ -880,18 +940,16 @@ tbody tr:last-child {&#13;
 	 * data.filter = the encoded query
 	 */
 
-		// Setup the DATA object from OPTIONS	
-		optCopy(['table', 'p', 'o', 'd', 'filter', 'filterACLs', 'fields', 'keywords', 'view']);
-		optCopy(['relationship_id', 'apply_to', 'apply_to_sys_id', 'window_size']);
-
-		// MAG added from Extension
-		optCopy(['field_list', 'view', 'headerTitle', 'title', 'show_breadcrumbs']);
+		//MAG precedence of inputs reminder:
+		// 1. INPUT -- set during runtime 
+		// 2. URL -- before there's an input
+		// 3. DATA obj -- if set earlier within the same script
+		// 4. Options -- default to avoid Blank
 
 		// Set Default values of DATA
-		data.title = input.headerTitle;
 		data.table = data.table || $sp.getParameter("t") || $sp.getParameter("table") || $sp.getParameter("sl_table") || options.table;
 		data.sys_id = data.sys_id || $sp.getParameter("sys_id") || $sp.getParameter("sl_sys_id") || options.sys_id;
-		data.filter = data.filter || $sp.getValue('filter');
+		data.filter = $sp.getParameter('filter') || $sp.getValue('filter') || data.filter;
 		data.keywords = data.keywords || $sp.getValue('keywords');
 		data.p = data.p || $sp.getValue('p') || 1;
 		data.p = parseInt(data.p);
@@ -915,8 +973,15 @@ tbody tr:last-child {&#13;
 		$sp.getValues(data);
 
 
+
+		// Setup the DATA object from OPTIONS	
+		optCopy(['table', 'p', 'o', 'd', 'filter', 'filterACLs', 'fields', 'keywords', 'view']);
+		optCopy(['relationship_id', 'apply_to', 'apply_to_sys_id', 'window_size']);
+		optCopy(['field_list', 'view', 'title', 'show_breadcrumbs', 'trigger_table']);
+
+
 		// Check Table and Fields to show
-//		var grCheckTable = new GlideRecordSecure(data.table);
+		//		var grCheckTable = new GlideRecordSecure(data.table);
 		var grCheckTable = new GlideRecord(data.table);
 		if (!data.table || !grCheckTable.isValid()) {
 			data.invalid_table = true;
@@ -930,9 +995,6 @@ tbody tr:last-child {&#13;
 
 
 
-
-
-
 		data.fields = data.field_list;
 		if (!data.fields) {
 			if (data.view)
@@ -940,11 +1002,11 @@ tbody tr:last-child {&#13;
 			else
 				data.fields = $sp.getListColumns(data.table);
 		}
-		
-		
-		
+
+
+
 		data.fields_array = data.fields.split(',');
-//		data.fields_array = $sp.getListColumns(data.table, data.view).split(',');
+		//		data.fields_array = $sp.getListColumns(data.table, data.view).split(',');
 
 		// use GlideRecord to get field labels vs. GlideRecordSecure
 		data.column_labels = {};
@@ -956,14 +1018,14 @@ tbody tr:last-child {&#13;
 			else
 				data.column_labels[field] = "-";
 		}
-		
-		
+
+
 
 		data.msg = {
 			sortingByAsc: gs.getMessage("Sorting by ascending"),
 			sortingByDesc: gs.getMessage("Sorting by descending")
 		};
-		
+
 		return data;
 	}
 
@@ -973,14 +1035,14 @@ tbody tr:last-child {&#13;
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:19:46</sys_created_on>
         <sys_id>14c96959db1010108599656b4b9619fe</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>40</sys_mod_count>
         <sys_name>MAG Notif List View</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_14c96959db1010108599656b4b9619fe</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-04-25 01:47:02</sys_updated_on>
+        <sys_updated_on>2020-05-04 23:45:40</sys_updated_on>
         <template><![CDATA[<style>
   table #list_item_{{data.sys_id}} {
 
@@ -988,24 +1050,32 @@ tbody tr:last-child {&#13;
     background-color: #03498e;
     border-color: 1px solid #fff;
   }
-  
-  table #list_item_{{data.sys_id}} td:last-child::after {
-      content: ">>";
-      float: right;
-      text-align: right;
-    }
 
+  table #list_item_{{data.sys_id}} td:last-child::after {
+    content: ">>";
+    float: right;
+    text-align: right;
   }
 </style>
 
 
+<!-- THIS is going to happen!
 
+https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0dbc01dcaf3231f961940
+
+-->
 
 
 
 <div class="panel panel-{{options.color}} b">
+
+
+  <!-- 
+**List Heading
+********************-->
   <div class="panel-heading form-inline" ng-hide="options.hide_header">
     <span class="dropdown m-r-xs">
+  <!-- Context menu -->
       <button aria-label="${{{data.title || data.table_plural}} Context Menu}" class="btn dropdown-toggle glyphicon glyphicon-menu-hamburger" style="line-height: 1.4em" id="optionsMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
       <ul class="dropdown-menu" aria-labelledby="optionsMenu">
         <li ng-repeat="t in ::exportTypes">
@@ -1013,20 +1083,35 @@ tbody tr:last-child {&#13;
         </li>
       </ul>
     </span>
+  <!-- Glyph & Title --
     <span class="panel-title"><i ng-if="options.glyph" class="fa fa-{{options.glyph}} m-r"></i>{{data.title || data.table_plural}}</span>
-    <button name="new" role="button" class="btn btn-primary btn-sm m-l-xs" ng-click="newRecord()" ng-if="options.show_new && data.canCreate && !data.newButtonUnsupported" aria-label="${Create new record}">${New}</button>
-    <div class="pull-right" ng-if="options.show_keywords">
+-->
+    <span class="panel-title">
+      Notifications for {{data.trigger_table}}
+      <button class="btn btn-icon icon-arrow-down-triangle sn-tooltip-basic btn-default" style="font-size: 10px;">
+      </button>
+    </span>
+    
+    
+    <!-- New -->
+    <button name="new" role="button" class="btn btn-primary btn-sm m-l-xs"
+            ng-click="newRecord()" ng-if="options.show_new && data.canCreate && !data.newButtonUnsupported"
+            aria-label="${Create new record}">${New}</button>
+    
+    <!-- Search -->
+    <div class="pull-right" > <!-- ng-if="options.show_keywords -->
       <form ng-if="data.hasTextIndex" ng-submit="setSearch(true)">
         <div class="input-group">
           <input type="text" name="datatable-search" ng-model="data.keywords" ng-model-options="{debounce:250}" class="form-control" placeholder="${Keyword Search}" aria-label="${Keyword Search}">
-          <span class="input-group-btn">
-            <button name="search" class="btn btn-default" type="submit" aria-label="${Search}"><span class="glyphicon glyphicon-search"></span></button>
-          </span>
         </div>
+        
       </form>
     </div>
     <div class="clearfix"></div>
   </div>
+
+
+
   <!-- body -->
   <div class="panel-body">
     <h2 class="sr-only data-table-title">{{data.title || data.table_plural}} ${table} - ${page} {{data.p}}</h2>
@@ -1054,7 +1139,7 @@ tbody tr:last-child {&#13;
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="item in data.list track by item.sys_id"
+        <tr ng-repeat="item in data.list | subjectContains: data.keywords as results track by item.sys_id"
             id="list_item_{{item.sys_id}}">
           <td role="cell"
               class="pointer sp-list-cell"
@@ -1063,15 +1148,16 @@ tbody tr:last-child {&#13;
               ng-repeat="field in ::data.fields_array"
               data-field="{{::field}}"
               data-th="{{::data.column_labels[field]}}">
-            <span
-                  ng-if="$first"
+            <span>
+<!--                  ng-if="$first"
                   aria-label="${Open record}: {{::item[field].display_value}}"
                   role="link"
                   tabindex="0">
               {{::item[field].display_value | limitTo : item[field].limit}}{{::item[field].display_value.length > item[field].limit ? '...' : ''}}
             </span>
             <span ng-if="!$first">
-              {{::item[field].display_value | limitTo : item[field].limit}}{{::item[field].display_value.length > item[field].limit ? '...' : ''}}
+               -->
+              {{::item[field].display_value}}
             </span>
           </td>
         </tr>

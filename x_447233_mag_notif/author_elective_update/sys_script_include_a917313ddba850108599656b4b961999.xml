@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="DELETE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>x_447233_mag_notif.subjectContains</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>subjectContains</name>
+        <script><![CDATA[(function() {
+	angular.module('subjectContainsFilter', []).filter('subjectContains', function() {
+		return function(input, filtervalue) {
+			var output = [];
+			if (filtervalue) {
+				for (var i = 0; i < input.length; i++) {
+					var subject = input[i].subject || input[i]["subject"];
+					if (subject.toLowerCase().indexOf(filterValue) != -1) {
+						output.push(input[i]);
+					}
+				}
+				return output;
+			} else {
+				return input;
+			}
+		};
+	});
+})();
+
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-03 22:58:50</sys_created_on>
+        <sys_id>a917313ddba850108599656b4b961999</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>subjectContains</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sys_script_include_a917313ddba850108599656b4b961999</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-05-03 22:58:50</sys_updated_on>
+    </sys_script_include>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</application>
+        <file_path/>
+        <instance_id>ae98a3eedb5c334052cec5970596195f</instance_id>
+        <instance_name>dev76769</instance_name>
+        <name>sys_script_include_a917313ddba850108599656b4b961999</name>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_script_include"&gt;&lt;sys_script_include action="INSERT_OR_UPDATE"&gt;&lt;access&gt;public&lt;/access&gt;&lt;active&gt;true&lt;/active&gt;&lt;api_name&gt;x_447233_mag_notif.subjectContains&lt;/api_name&gt;&lt;caller_access/&gt;&lt;client_callable&gt;false&lt;/client_callable&gt;&lt;description/&gt;&lt;name&gt;subjectContains&lt;/name&gt;&lt;script&gt;&lt;![CDATA[(function() {
+	angular.module('subjectContainsFilter', []).filter('subjectContains', function() {
+		return function(input, filtervalue) {
+			var output = [];
+			if (filtervalue) {
+				for (var i = 0; i &lt; input.length; i++) {
+					var subject = input[i].subject || input[i]["subject"];
+					if (subject.toLowerCase().indexOf(filterValue) != -1) {
+						output.push(input[i]);
+					}
+				}
+				return output;
+			} else {
+				return input;
+			}
+		};
+	});
+})();
+
+]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sys_script_include&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2020-05-03 22:58:50&lt;/sys_created_on&gt;&lt;sys_id&gt;a917313ddba850108599656b4b961999&lt;/sys_id&gt;&lt;sys_mod_count&gt;0&lt;/sys_mod_count&gt;&lt;sys_name&gt;subjectContains&lt;/sys_name&gt;&lt;sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif"&gt;d546ad95db1010108599656b4b9619be&lt;/sys_package&gt;&lt;sys_policy&gt;read&lt;/sys_policy&gt;&lt;sys_scope display_value="MAG Notification Editor"&gt;d546ad95db1010108599656b4b9619be&lt;/sys_scope&gt;&lt;sys_update_name&gt;sys_script_include_a917313ddba850108599656b4b961999&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2020-05-03 22:58:50&lt;/sys_updated_on&gt;&lt;/sys_script_include&gt;&lt;/record_update&gt;</payload>
+        <payload_hash>-736096786</payload_hash>
+        <record_name>subjectContains</record_name>
+        <reverted_from/>
+        <source>be767f84db2450108599656b4b96199d</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-03 22:58:50</sys_created_on>
+        <sys_id>cdf8353ddba850108599656b4b9619b3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>171dcc378530000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-05-03 22:58:50</sys_updated_on>
+        <type>Script Include</type>
+        <update_guid>09f8353d41a85010dfd9286365b553b3</update_guid>
+        <update_guid_history>09f8353d41a85010dfd9286365b553b3:-736096786</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-03 23:04:39</sys_created_on>
+        <sys_db_object display_value="" name="sys_script_include">sys_script_include</sys_db_object>
+        <sys_id>52a4c77168ad4e049892f33a9e19d710</sys_id>
+        <sys_metadata>a917313ddba850108599656b4b961999</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>subjectContains</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_parent/>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_scope_delete display_value="">22a1b2e2267044bc896dad3216f319e4</sys_scope_delete>
+        <sys_update_name>sys_script_include_a917313ddba850108599656b4b961999</sys_update_name>
+        <sys_update_version display_value="sys_script_include_a917313ddba850108599656b4b961999">cdf8353ddba850108599656b4b9619b3</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-05-03 23:04:39</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

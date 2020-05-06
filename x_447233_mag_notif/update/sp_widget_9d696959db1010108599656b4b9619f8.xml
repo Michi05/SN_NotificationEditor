@@ -227,29 +227,47 @@ var localFunctions = {
 
 
 
+///////////////////////////////////////
+// MAG Styling of the whole Body Editor
+///////////////////////////////////////
 
-// MAG HTML box styling
-#MessageHTMLBox {
-  width: 100%;
-  height: 40vh;
+#InputBodyEditor {
+  margin-top: 3em;
+  
+  .mce-container &gt; .mce-container-body {
+      border-radius: 1em;
+  }
+  
+  .mce-container &gt; iframe {
+    min-height: 40vh;
+  }
+  
+    
+  // MAG HTML box styling
+  #MessageHTMLBox {
+    width: 100%;
+    height: 40vh;
 
-  border-width: thin;
-  border-color: gray;
+    border-width: thin;
+    border-color: gray;
 
-  display: block;
-  top: 0;
-  left: 0;
-  width: 70%;
-  float: left;
-}
-
-// MAG Field select tree on the side
-#fields_email_tree_sysevent_email_action {
     display: block;
-    float: right;
-    position: relative;
-    right: 0px;
-    top: 0px;
+    top: 0;
+    left: 0;
+    float: left;
+    
+    
+
+    // Remove weird 'Alt F10 to focus' message
+    &amp;&gt;div:first-child {
+      display: none;
+    } // Ensuring tha this won't remove the editor if the first child changes (because of accessibility options)
+    &amp;&gt;div.mce-container:first-child {
+      display: block;
+    }
+    
+  }
+  
 }
 
 
@@ -257,7 +275,49 @@ var localFunctions = {
 
 
 
-#sp_formfield_condition, #sp_save_button {
+
+
+///////////////////////////////////////
+// MAG Styling of the aside panel for vbles
+///////////////////////////////////////
+
+aside.panel-group {
+    width: 20em;
+    position: absolute;
+    right: 1em;
+  
+  section.panel {
+    border-radius: 1em;
+    box-shadow: -3px 3px 10px 0px rgba(0, 0, 0, .4);
+    -webkit-box-shadow: -3px 3px 10px 0px rgba(0, 0, 0, .4);
+  }
+
+
+  header.panel-heading {
+    border-radius: 1em 1em 0em 0em;
+  }
+
+  .panel-footer {
+    border-radius: 0em 0em 1em 1em;
+    text-align: center;
+  }
+
+  header, li {
+    padding: 1em;
+  }
+}
+
+
+// MAG -- Template field &amp; link
+.link_box {
+  border: 1px darkgray;
+}
+
+
+
+
+
+#sp_formfield_template, #sp_formfield_subject, #sp_save_button {
   display: inline-block;
 }
 
@@ -327,14 +387,15 @@ div#EditableContent {
 	try {
 		/* "use strict"; -linter issues */
 
+		
 		///////////////////////////////////
 		// Pre-populate the 'data' variable
 		///////////////////////////////////
 		data.f = {};
 		data.recordAddedMsg = gs.getMessage("Record Added");
 		data.updatedMsg = gs.getMessage("updated_uppercase");
-		data.process_msg = "Data obj2 Initialized";
 
+		
 		//  var security_mgr = GlideSecurityManager.get();
 		//  var right_path = "sp/configure.all/execute";
 		//  var canDelete = security_mgr.hasRightsTo(right_path, null);
@@ -363,29 +424,28 @@ div#EditableContent {
 			$sp.getParameter("view") ||
 			$sp.getParameter("v"); // no default
 
-		data.process_msg = "Got TO the Input section";
+		
+		
+		
+		
 		///////////////////////////////////
-		// Store values from 'input' or options or URL
+		// Use values from 'input'
 		///////////////////////////////////
 		if (input) {
 			// input == c.data on client
 			input.table = input.table || data.table;
 			input.sys_id = input.sys_id || data.sys_id;
 
-			gs.error("input.mag = " + JSON.stringify(input.mag));
-
 			if (input.mag && input.mag.usr_action == "saveRecord") {
 				var result = $sp.saveRecord(input.table, input.sys_id, input.f._fields);
 				data.sys_id = result.sys_id;
 			}
 
-			if (input.sys_id == "-1")
+			if (input.sys_id == "-1") {
 				data.isNewRecord = true;
-
-			//		return;
+				return;
+			}
 		}
-
-		data.process_msg = "Got passed the Input section";
 
 		///////////////////////////////////
 		// Pick up the target record
@@ -394,67 +454,58 @@ div#EditableContent {
 		data.isTargetValid = null;
 		data.preview_url = null;
 
-		data.process_msg = "Printing typeof $sp.getRecord: " + (typeof $sp.getRecord);
 		var rec = null;
-
-		try{
-			//	rec = $sp.getRecord(data.table, data.sys_id);
-			rec = $sp.getRecord();
-			//	var rec = new GlideRecord(data.table);
-		}
-		catch(e) {
-			data.process_msg = "Stupid ERROR: " + e.message;
-			gs.error(e.message);
-			return;
-		}
-
-		data.process_msg = "After getRecord";
+		// rec = $sp.getRecord(data.table, data.sys_id);
+		rec = $sp.getRecord();
+		//			rec = new GlideRecord(data.table);
 
 		if (!rec || !rec.isValid() || data.sys_id == -1){	
-			data.process_msg = "Finished early with invalid  table or ID";
+			gs.warn("NOTIFs Widget::Form: Finished early with invalid table or ID");
 			return;
 		}
-		else
-			data.process_msg = "ELSE";
-
-		// For extensions, I suppose:
+		// LEGACY: Check if Sys_id having the right "shape"
+//		var sys_id_str = (data.sys_id || "").toString();
+		//		if (sys_id_str.match(/^\w{32}$/) != null)
+	
+		
+		// For extensions, I suppose??:
 		//	data.table = rec.getRecordClassName();
 		//	data.tableHierarchy = GlideDBObjectManager.getTables(data.table)
 		//		.toArray()
 		//		.join();
 
-		data.process_msg = "Got passed the Table checks";
-
-
+		
 		///////////////////////////////////
-		// Prepare record for the form
+		// Confirmed record. Setup the form
 		///////////////////////////////////
 
+		data.table_tmce = data.table + "_tmce";
+		data.isTargetValid = true;
 		data.canWrite = rec.canWrite();
 		var hasRecordAccess = data.sys_id == "-1" ? rec.canCreate() : data.canWrite;
 		data.f = $sp.getForm(data.table, data.sys_id, data.query, data.view);
 
+		///////////////////////////////////
+		// Scope Checks (NOT Working)
+		///////////////////////////////////
+
 		// Show message when record is in cross app scope
+		// ERROR: Function isInSelectedScope is not allowed in scope x_447233_mag_notif
 		data.f.outOfScope = false; // TODO: !rec.isInSelectedScope();
 		// Populate scope labels only when needed
 		if (data.f.outOfScope) {
+			//Function getScopeLabelByRecordId is not allowed in scope
 			data.f.recordScopeLabel = gs.getScopeLabelByRecordId(rec.getUniqueValue());
 			data.f.currentScopeLabel = gs.getCurrentApplicationName();
 		}
 
-
+		// MAG NOTE: I might need this if some Notifications have only text?
 		//	data.messageHTML_content =
-		//		rec.getValue("message_html") || rec.getValue("message_text");
+		//		rec.getValue("message_html") || rec.getValue("message_text") || rec.getValue("message");
 
-		data.table_tmce = data.table + "_tmce";
-
-		var sys_id_str = (data.sys_id || "").toString();
-		if (sys_id_str.match(/^\w{32}$/) != null) {
-			data.isTargetValid = true;
-		}
 	}
 	catch (main_err) {
-		gs.error("Widget::Notif Form: " + main_err.name + " \n > " + main_err.message);
+		gs.error("NOTIFs Widget::Form: " + main_err.name + " \n >> " + main_err.message);
 	}
 })($sp, input, data, options, gs);
 ]]></script>
@@ -463,14 +514,14 @@ div#EditableContent {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:18:12</sys_created_on>
         <sys_id>9d696959db1010108599656b4b9619f8</sys_id>
-        <sys_mod_count>30</sys_mod_count>
+        <sys_mod_count>73</sys_mod_count>
         <sys_name>MAG Notif Form</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_9d696959db1010108599656b4b9619f8</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-04-28 21:32:38</sys_updated_on>
+        <sys_updated_on>2020-05-06 01:00:26</sys_updated_on>
         <template><![CDATA[<div>
   <!-- readOnly due to scope -->
   <div ng-if="data.f.outOfScope" class="read-only-message">
@@ -485,8 +536,8 @@ div#EditableContent {
     <dialog open><h2>
       ${ Start by selecting an item from the List on the side.}
       </h2></dialog>
-    
-<!--
+
+    <!--
 Alternative solutions for centering in this amazing page:
 https://levelup.gitconnected.com/10-ways-to-center-a-div-horizontally-and-vertically-in-css-53ca5eb912db
 -->
@@ -518,10 +569,10 @@ aria-labelledby="{{c.commentsPrompt}}"
 class="kb-comment-input" id="comment">
 </sp-tinymce-editor>
 
-  <div id="EditableContent" ng-if="data.isTargetValid">
+<div id="EditableContent" ng-if="data.isTargetValid">
 -->
 
-  <div id="EditableContent" ng-if="true">
+  <div id="EditableContent" ng-if="data.isTargetValid">
 
     <section id="InputFields">
       <p>
@@ -548,11 +599,24 @@ class="kb-comment-input" id="comment">
           <option value="Never">Never (inactive)</option>
         </select>
       </p>
+      
+
+      <p>
+
+        <span class="input_label">${ Template}</span>
+        <a href="?id=lf&table=sysevent_email_template&filter=&sys_id={{data.f._fields.template.value}}">
+          <span class="info_only_fixed link_box"
+                name="template_field"
+                id="sp_formfield_template">
+            {{data.f._fields.template.displayValue}} ⬈
+          </span>
+        </a>
+      </p>
 
       <p>
         <span class="input_label">${️‍️ Subject}</span>
-        <input name="condition"
-               id="sp_formfield_condition"
+        <input name="subject_field"
+               id="sp_formfield_subject"
                class="form-control input_field"
                maxlength="254"
                data-type="text"
@@ -583,14 +647,48 @@ class="kb-comment-input" id="comment">
                          ng-model="data.f._fields.message_html.value"
                          id="MessageHTMLBox">
       </sp-tinymce-editor>
-
-
-      <div id="fields_email_tree_sysevent_email_action" class="well glide_html_script_fieldarea" style="height: 208px;"><div id="treenode_3"><div role="tree"><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr style="display: none;"><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_minus.gifx" alt="" style="margin-left: -16px;"></td><td class="tree_spacer"><img alt="" aria-hidden="true" src="images/gwt/folder_closed.gifx"></td><td title="" class="tree_item_text" role="treeitem" tabindex="0" aria-level="-1" aria-expanded="true" aria-controls="" data-original-title="" style="color: rgb(153, 153, 153);">Root<span></span></td></tr></tbody></table><div role="group" style="display: block;"><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_minus.gifx" alt="" style="margin-left: 0px;"></td><td class="tree_spacer"><img alt="" aria-hidden="true" src="images/gwt/folder_open.gifx"></td><td title="" class="tree_item_text" role="treeitem" tabindex="0" aria-level="0" aria-expanded="true" aria-controls="" data-original-title="" style="color: rgb(153, 153, 153);">Fields<span></span></td></tr></tbody></table><div role="group" style="display: block;"><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="" data-original-title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Active</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text" data-original-title=""><a name="" role="treeitem" tabindex="0" aria-level="1">Activity due</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text" data-original-title=""><a name="" role="treeitem" tabindex="0" aria-level="1">Actual end</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text" data-original-title=""><a name="" role="treeitem" tabindex="0" aria-level="1">Actual start</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text" data-original-title=""><a name="" role="treeitem" tabindex="0" aria-level="1">Additional assignee list</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text" data-original-title=""><a name="" role="treeitem" tabindex="0" aria-level="1">Additional comments</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Approval</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Approval history</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="" data-original-title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Approval set</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Assigned to</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Assignment group</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Business duration</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Business resolve time</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Caller</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Category</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Caused by Change</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Change Request</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Child Incidents</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Closed</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Closed by</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Comments and Work notes</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Company</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Configuration item</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Contact type</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Contract</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Correlation ID</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Correlation display</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Created</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Created by</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Delivery plan</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Delivery task</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Description</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Domain</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Domain Path</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Due date</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Duration</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Escalation</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Expected start</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Follow up</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Group list</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">HTML description</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Impact</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Incident state</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Knowledge</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Last reopened at</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Last reopened by</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Location</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Made SLA</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Notify</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Number</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">On hold reason</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Opened</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Opened by</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Order</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Parent</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Parent Incident</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Priority</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Problem</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Reassignment count</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Reopen count</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Resolution code</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Resolution notes</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Resolve time</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Resolved</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Resolved by</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">SLA due</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Service</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/table.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Service offering</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Severity</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Short description</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Skills</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">State</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/element.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Subcategory</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Sys ID</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Tags</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Task type</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Time worked</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/indexed2.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Updated</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Updated by</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Updates</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Upon approval</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Upon reject</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Urgency</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">User input</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Watch list</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Work notes</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="task" aria-hidden="true" src="images/foreign.gifx" title="task"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1">Work notes list</a><span></span></td></tr></tbody></table><div role="group"></div></div><div><table role="presentation" cellspacing="0px" cellpadding="0px" style="background-color: transparent;"><tbody><tr><td><img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_plus.gifx" alt="" style="margin-left: 16px;"></td><td class="tree_spacer"><img alt="incident" aria-hidden="true" src="images/table.gifx" title="incident"></td><td title="" class="tree_item_text"><a name="" role="treeitem" tabindex="0" aria-level="1" aria-expanded="false" aria-controls="">Questions</a><span></span></td></tr></tbody></table><div role="group"></div></div></div></div></div></div></div></div>
-
     </section>
-    
-  </div>
 
-</div>]]></template>
+    
+    <!-- Possible 'roles': https://www.w3.org/WAI/PF/HTML/wiki/RoleAttribute 
+Icons (emojipedia) -- ️️
+-->
+
+    <aside class="panel-group">
+      <section role="tree" class="panel panel-default">
+        <header role="presentation" class="panel-heading">
+          <h3 class="panel-title">
+            <img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_minus.gifx" alt="" style="margin-left: -16px;">
+            <img alt="" aria-hidden="true" src="images/gwt/folder_open.gifx">
+            <a data-toggle="collapse" href="#collapse1">Use ticket variables</a>
+          </h3>
+        </header>
+
+        <div role="group" id="collapse1" class="panel-collapse collapse">
+          <ul role="presentation" id="macro_list" class="list-group">
+            <li id="macro_reference" class="list-group-item">
+              <img class="tree tree_icon_pre" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;">
+              <img class="tree_icon_in" alt="task" aria-hidden="true" src="images/indexed2.gifx" title="" data-original-title="task">
+              <a name="" role="treeitem" tabindex="0" aria-level="1">${active}</a>
+            </li>
+            <li id="macro_reference" class="list-group-item">
+              <img class="tree tree_icon_pre" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;">
+              <img class="tree_icon_in" alt="" aria-hidden="true" src="images/gwt/folder_closed.gifx">
+              <a name="" role="treeitem" tabindex="0" aria-level="1">${u_reference}</a>
+            </li>
+            <li id="macro_reference" class="list-group-item">
+              <span class="tree_icon_pre"></span>
+              <a name="" role="treeitem" tabindex="0" aria-level="1">${total_value}</a>
+            </li>
+          </ul>
+          <div class="panel-footer">...click any to copy...</div>
+        </div>
+      </section>
+    </aside>
+
+
+  </div>
+</div>
+]]></template>
     </sp_widget>
 </record_update>

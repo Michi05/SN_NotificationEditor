@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_script">
+    <sys_ui_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <description/>
+        <global>false</global>
+        <name>x_447233_mag_notif.subjectContainsFilter</name>
+        <script><![CDATA[(function() {
+	angular.module('subjectContainsFilter', []).filter('subjectContains', function() {
+		return function(input, filterValue) {
+			var output = [];
+			if (filterValue) {
+				var lowerCase_filter = (filterValue || "").toString().toLowerCase();
+				for (var i = 0; i < input.length; i++) {
+					
+					// Test against the Display Value, since that's what they'll see
+					//(same in this case, but for general consistency)
+					var subject = (input[i]["subject"]["display_value"] || "").toString().toLowerCase();
+					if (subject.indexOf(lowerCase_filter) != -1) {
+						output.push(input[i]);
+					}
+				}
+				return output;
+			} else {
+				return input;
+			}
+		};
+	});
+})();
+
+]]></script>
+        <script_name>subjectContainsFilter</script_name>
+        <sys_class_name>sys_ui_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-03 23:04:29</sys_created_on>
+        <sys_id>a00a31bddba850108599656b4b961924</sys_id>
+        <sys_mod_count>6</sys_mod_count>
+        <sys_name>x_447233_mag_notif.subjectContainsFilter</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sys_ui_script_a00a31bddba850108599656b4b961924</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-05-06 00:28:37</sys_updated_on>
+        <ui_type>10</ui_type>
+        <use_scoped_format>false</use_scoped_format>
+    </sys_ui_script>
+</record_update>
