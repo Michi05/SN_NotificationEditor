@@ -36,6 +36,35 @@
 //		localFunctions.initForm(gFormInstance);
 	});
 	
+	$scope.variable_to_clipboard = function(text) {
+		if (!text){
+			spUtil.addErrorMessage("Unable to copy without selection.");
+			return;
+		}
+		// Wrap with the right syntax
+		var $lcb = '{'; // "{'{'}";
+		var $rcb = '}'; //  "{'}'}";
+		text = "$" + $lcb + text + $rcb;
+		
+		// Create temporary element
+		var $d = $window.document;
+		var copiable_text = $d.createElement("textarea"); // Type == input
+		copiable_text.innerText = text;
+		
+		/* Append +Select +Copy +Remove */
+		jQuery("body").append(copiable_text);
+		copiable_text.select();
+		copiable_text.setSelectionRange(0, 99999); /*For mobile devices*/
+		var copied = $d.execCommand("copy"); // Element MUST be in the DOM
+		copiable_text.remove();
+
+		if (copied){
+			spUtil.addInfoMessage("Copied to clipboard: " + text);
+		}
+		else
+			spUtil.addErrorMessage("Unable to copy: " + text);
+	};
+	
 	
 	///////////////////////////////////
 	// Client-controller Functions
@@ -282,14 +311,17 @@ var localFunctions = {
 ///////////////////////////////////////
 
 aside.panel-group {
-    width: 20em;
-    position: absolute;
-    right: 1em;
-  
+  width: 20em;
+  position: absolute;
+  right: 1em;
+
   section.panel {
     border-radius: 1em;
     box-shadow: -3px 3px 10px 0px rgba(0, 0, 0, .4);
     -webkit-box-shadow: -3px 3px 10px 0px rgba(0, 0, 0, .4);
+
+    max-height: 40vh;
+    overflow-y: scroll;
   }
 
 
@@ -298,12 +330,18 @@ aside.panel-group {
   }
 
   .panel-footer {
-    border-radius: 0em 0em 1em 1em;
     text-align: center;
+    bottom: -1px;
+    position: sticky;
   }
 
   header, li {
     padding: 1em;
+    
+    .tree_icon_in {
+      margin: 0 0.5em;
+    }
+    
   }
 }
 
@@ -502,7 +540,17 @@ div#EditableContent {
 		// MAG NOTE: I might need this if some Notifications have only text?
 		//	data.messageHTML_content =
 		//		rec.getValue("message_html") || rec.getValue("message_text") || rec.getValue("message");
-
+		
+		
+		
+		///////////////////////////////////
+		// Create the list of fields to use in the eMail
+		///////////////////////////////////
+		if (data.f && data.f._fields && data.f._fields.collection){
+			var allFields = MAG_Utils.getAllFields(data.f._fields.collection.value);
+			data.target_field_variables = allFields;
+		}
+		
 	}
 	catch (main_err) {
 		gs.error("NOTIFs Widget::Form: " + main_err.name + " \n >> " + main_err.message);
@@ -514,14 +562,14 @@ div#EditableContent {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:18:12</sys_created_on>
         <sys_id>9d696959db1010108599656b4b9619f8</sys_id>
-        <sys_mod_count>73</sys_mod_count>
+        <sys_mod_count>114</sys_mod_count>
         <sys_name>MAG Notif Form</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_9d696959db1010108599656b4b9619f8</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-05-06 01:00:26</sys_updated_on>
+        <sys_updated_on>2020-05-10 11:35:02</sys_updated_on>
         <template><![CDATA[<div>
   <!-- readOnly due to scope -->
   <div ng-if="data.f.outOfScope" class="read-only-message">
@@ -540,12 +588,17 @@ div#EditableContent {
     <!--
 Alternative solutions for centering in this amazing page:
 https://levelup.gitconnected.com/10-ways-to-center-a-div-horizontally-and-vertically-in-css-53ca5eb912db
+
+TODO:
+ -- Handle Mobile and small screens somehow
+snmCabrillo.modal.presentModal("MY MODAL!!", "", snmCabrillo.modal.CLOSE_BUTTON_STYLE_CLOSE, snmCabrillo.modal.MODAL_PRESENTATION_STYLE_FORM_SHEET);
+
 -->
   </div>
 
 
 
-  <!--
+  <!-- Preview URL for iFrame
 .../notification_preview_html_body.do?
 sysparm_record_id=1c741bd70b2322007518478d83673af3
 &sysparm_user_id=6816f79cc0a8016401c5a33be04be441
@@ -570,6 +623,7 @@ class="kb-comment-input" id="comment">
 </sp-tinymce-editor>
 
 <div id="EditableContent" ng-if="data.isTargetValid">
+
 -->
 
   <div id="EditableContent" ng-if="data.isTargetValid">
@@ -652,6 +706,11 @@ class="kb-comment-input" id="comment">
     
     <!-- Possible 'roles': https://www.w3.org/WAI/PF/HTML/wiki/RoleAttribute 
 Icons (emojipedia) -- ️️
+
+            <li id="macro_reference" class="list-group-item">
+              <span class="tree_icon_pre"></span>
+              <a name="" role="treeitem" tabindex="0" aria-level="1">${total_value}</a>
+            </li>
 -->
 
     <aside class="panel-group">
@@ -666,19 +725,20 @@ Icons (emojipedia) -- ️️
 
         <div role="group" id="collapse1" class="panel-collapse collapse">
           <ul role="presentation" id="macro_list" class="list-group">
-            <li id="macro_reference" class="list-group-item">
-              <img class="tree tree_icon_pre" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;">
-              <img class="tree_icon_in" alt="task" aria-hidden="true" src="images/indexed2.gifx" title="" data-original-title="task">
-              <a name="" role="treeitem" tabindex="0" aria-level="1">${active}</a>
-            </li>
-            <li id="macro_reference" class="list-group-item">
-              <img class="tree tree_icon_pre" aria-hidden="true" src="images/s.gifx" alt="" style="margin-left: 16px;">
-              <img class="tree_icon_in" alt="" aria-hidden="true" src="images/gwt/folder_closed.gifx">
-              <a name="" role="treeitem" tabindex="0" aria-level="1">${u_reference}</a>
-            </li>
-            <li id="macro_reference" class="list-group-item">
-              <span class="tree_icon_pre"></span>
-              <a name="" role="treeitem" tabindex="0" aria-level="1">${total_value}</a>
+            <li id="macro_reference"
+                class="list-group-item"
+                ng-repeat="field in ::data.target_field_variables track by field.name">
+              <img ng-if="field.type != 'reference'"
+                   class="tree_icon_in" alt="task"
+                   aria-hidden="true" src="images/indexed2.gifx"
+                   title="" data-original-title="task">
+              <img ng-if="field.type == 'reference'"
+                   class="tree_icon_in" alt=""
+                   aria-hidden="true" src="images/gwt/folder_closed.gifx">
+              <span
+                    ng-click="variable_to_clipboard(field.name, document || $document)"
+                    title="{{::field.name}}"
+                    class="field_variable">{{::field.label}}</span>
             </li>
           </ul>
           <div class="panel-footer">...click any to copy...</div>

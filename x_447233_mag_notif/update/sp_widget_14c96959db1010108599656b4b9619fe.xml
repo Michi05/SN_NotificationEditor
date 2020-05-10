@@ -495,7 +495,7 @@ table {
   margin-bottom: 0;
 
 
-  // MAG-List hover effect
+/* MAG-List hover effect */
   tbody&gt;tr:hover {
     text-shadow: 0 0 2px #293e40;
   }
@@ -506,7 +506,7 @@ table {
 }
 
 
-// MAG-List outter style
+/* MAG-List outter style */
 .panel.panel-default.b, .panel.panel-default.b&gt;div {
   margin: 1em;
   border-radius: 2em;
@@ -598,8 +598,32 @@ tbody tr:last-child {
 	}
 }
 
+/*//////////////////////////////////////////
+// MAG List heading
+//////////////////////////////////////////*/
 
-// MAG Header integrated button
+// Table selector
+#select_trigger_table {
+  margin-left: 1em;
+  padding-left: 1em;
+  min-width: max-content;
+
+  border: 0;
+  border-radius: 1em;
+  text-decoration: underline;
+/*  background: #ffffffbd; */
+  box-shadow: 0 0 5px 0px lightgrey;
+  background: transparent;
+  
+}
+
+#select_trigger_table:focus {
+  outline: none !important; 
+  box-shadow: 0 0 -10px 0px lightgrey;
+}
+
+
+// Integrated button
 
 [class^="icon-"]:before, [class*=" icon-"]:before {
     vertical-align: middle;
@@ -607,7 +631,8 @@ tbody tr:last-child {
 
 .icon-arrow-down-triangle:before {
     content: "\f111";
-  // "\f125" &gt;&gt; w/ the squares
+/*    // "\f125" &gt;&gt; w/ the squares */
+
 }
 
 [class^="icon-"]:before, [class*=" icon-"]:before {
@@ -625,16 +650,17 @@ tbody tr:last-child {
 }
 </css>
         <data_table>sp_instance_table</data_table>
-        <demo_data>{"data":
-	{
-		"table": "incident",
-		"view": "default",
-		"o": "opened_at",
-		"d": "desc",
-		"filter": "activeEQtrue",
-		"p": 1,
-		"fields": "number,short_description"
-	}
+        <demo_data>{"data":&#13;
+	{&#13;
+		"table": "incident",&#13;
+		"view": "default",&#13;
+		"o": "opened_at",&#13;
+		"d": "desc",&#13;
+		"filter": "activeEQtrue",&#13;
+		"p": 1,&#13;
+		"fields": "number,short_description",&#13;
+"title":"Notifications for "&#13;
+	}&#13;
 }</demo_data>
         <description/>
         <docs/>
@@ -784,6 +810,11 @@ tbody tr:last-child {
 
 	//temp
 	data.trigger_table = "Incident";
+		
+		
+		
+		
+		
 
 		////////////////////////////////////////
 		// Deal w/ input, if any
@@ -894,6 +925,55 @@ tbody tr:last-child {
 			enable_filter: data.enable_filter
 		};
 		data.filterBreadcrumbs = $sp.getWidget('widget-filter-breadcrumbs', breadcrumbWidgetParams);
+		
+		
+		
+
+		
+		
+		
+		////////////////////////////////////////
+		// Load list of tables for selecting
+		////////////////////////////////////////
+		// TODO: remove all the useless "returns" to arrive here for sure unless there's a serious exception
+		
+		data.trigger_table_list = [];
+		if (data.table) {
+			var collection_groups = new GlideAggregate(data.table);
+			collection_groups.addAggregate('count');
+			collection_groups.addAggregate('count', 'collection');
+			//			collection_groups.addAggregate('count(distinct','collection');
+			//			collection_groups.addQuery("active", true);
+			
+			collection_groups.addQuery("message_htmlISNOTEMPTY");
+			
+			// TODO: generate a property with all Task tables by Default:
+			/* if (!gs.getProperty("")){
+				var tables = (...aggregate...)
+				var task_tables = new GlideRecord(dictionary);
+				task_tables.name in tables
+				AND task_tables.extends == task
+				
+				return all task_tables
+			}
+			*/
+
+			collection_groups.groupBy('collection');
+			collection_groups.query();
+			while (collection_groups.next()) {
+				if (collection_groups.getAggregate('count', 'collection') > 4) // TODO: change this joke... :) 
+				data.trigger_table_list.push({
+					value: collection_groups.getValue('collection'),
+					displayValue: collection_groups.getDisplayValue('collection') || "All" // Empty == All tables
+				})
+			}
+
+//			data.trigger_table_count = collection_groups.getAggregate('count(distinct','collection');
+		}
+		
+			
+			
+			
 
 	}
 	catch(main_err) {
@@ -1035,14 +1115,14 @@ tbody tr:last-child {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:19:46</sys_created_on>
         <sys_id>14c96959db1010108599656b4b9619fe</sys_id>
-        <sys_mod_count>40</sys_mod_count>
+        <sys_mod_count>59</sys_mod_count>
         <sys_name>MAG Notif List View</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_14c96959db1010108599656b4b9619fe</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-05-04 23:45:40</sys_updated_on>
+        <sys_updated_on>2020-05-10 11:33:27</sys_updated_on>
         <template><![CDATA[<style>
   table #list_item_{{data.sys_id}} {
 
@@ -1059,7 +1139,7 @@ tbody tr:last-child {
 </style>
 
 
-<!-- THIS is going to happen!
+<!-- Angular JS Filters
 
 https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0dbc01dcaf3231f961940
 
@@ -1084,12 +1164,22 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
       </ul>
     </span>
   <!-- Glyph & Title --
-    <span class="panel-title"><i ng-if="options.glyph" class="fa fa-{{options.glyph}} m-r"></i>{{data.title || data.table_plural}}</span>
--->
-    <span class="panel-title">
+    <span class="panel-title"></span>
       Notifications for {{data.trigger_table}}
       <button class="btn btn-icon icon-arrow-down-triangle sn-tooltip-basic btn-default" style="font-size: 10px;">
       </button>
+-->
+    <span class="panel-title">
+      <i ng-if="options.glyph" class="fa fa-{{options.glyph}} m-r"></i>{{data.title}}
+      <select id="select_trigger_table" class="input_field" required>
+        <option value="{{data.trigger_table}}" selected>{{data.trigger_table}}</option>
+        <option ng-repeat="table in ::data.trigger_table_list" value="{{::table.value}}">
+          {{::table.value}}
+        </option>
+        <option value="">All</option>
+      </select>
+      
+      
     </span>
     
     
@@ -1163,11 +1253,18 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
         </tr>
       </tbody>
     </table>
+    
+    <!-- TODO:
+Fix pagination to allow dynamic filtering instead
+   -->
     <div ng-class="{'pruned-msg-filter-pad': (!options.show_breadcrumbs || !data.filter) && !data.list.length}" class="pruned-msg" ng-if="rowsWerePruned()">
       <span ng-if="rowsPruned == 1">${{{rowsPruned}} row removed by security constraints}</span>
       <span ng-if="rowsPruned > 1">${{{rowsPruned}} rows removed by security constraints}</span>
     </div>
   </div>
+  
+  
+  
   <!-- footer -->
   <div class="panel-footer" ng-hide="options.hide_footer" ng-if="data.row_count">
     <div class="btn-toolbar m-r pull-left">

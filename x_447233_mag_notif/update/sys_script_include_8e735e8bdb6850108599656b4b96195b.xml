@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>x_447233_mag_notif.MAG_Utils</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <name>MAG_Utils</name>
+        <script><![CDATA[var MAG_Utils = Class.create();
+MAG_Utils.prototype = {
+    initialize: function() {
+    },
+
+    type: 'MAG_Utils'
+};
+
+MAG_Utils.getAllFields = function (tgt_table) {
+	
+	var allFields = [{
+		name: "sys_id",
+		label: "Sys ID",
+		type: "sys_id"
+	}];
+	var tableAncestors = [tgt_table, "task"]; //TODO: change 'task' for the first real ancestor for now
+	//var tableAncestors = SNC.TableEditor.getTableAncestors("incident");
+	var dictionary = new GlideRecord("sys_dictionary");
+	dictionary.orderBy("column_label");
+	dictionary.addQuery('name', 'ONE IN', tableAncestors);
+	dictionary.addQuery('element', '!=', 'NULL');
+	dictionary.addQuery('element', '!=', 'sys_id'); // Causes duplicates and I can add manually if needed
+	dictionary.query();
+
+	while (dictionary.next()) {
+		allFields.push({
+			name: dictionary.getValue("element"),
+			label: dictionary.getDisplayValue(),
+			type: dictionary.getValue("internal_type")
+		});
+	}
+	
+	return allFields;
+};
+]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-07 22:09:42</sys_created_on>
+        <sys_id>8e735e8bdb6850108599656b4b96195b</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>MAG_Utils</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy>read</sys_policy>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sys_script_include_8e735e8bdb6850108599656b4b96195b</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-05-07 22:27:46</sys_updated_on>
+    </sys_script_include>
+</record_update>
