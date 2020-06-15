@@ -12,17 +12,31 @@ MAG_Utils.prototype = {
     initialize: function() {
     },
 
-    type: 'MAG_Utils'
+	type: 'MAG_Utils'
 };
 
-MAG_Utils.getAllFields = function (tgt_table) {
+MAG_Utils._getUtilsGLOBAL = function () {
+	try {
+		if (gs.nil(global.NotificationEditorUtils))
+			return null;
+		var NEU = new global.NotificationEditorUtils();
+		gs.info(JSON.stringify(NEU));
+		return NEU || null;
+	}
+	catch(e) {
+		gs.error("MAG_Utils._getUtilsGLOBAL::" + e.message);
+	}
 	
-	var allFields = [{
-		name: "sys_id",
-		label: "Sys ID",
-		type: "sys_id"
-	}];
-	var tableAncestors = [tgt_table, "task"]; //TODO: change 'task' for the first real ancestor for now
+};
+
+// Receives the internal name of a table
+// Uses the global scope Utils 
+// Return all fields defined for the table and its ancestors
+MAG_Utils.getAllFields = function (tgt_table) {
+	var globalUtil = MAG_Utils._getUtilsGLOBAL();
+	var tableAncestors = (globalUtil? [tgt_table, "task"]:globalUtil.getTableAncestors(tgt_table));
+	
+	var allFields = [];
 	//var tableAncestors = SNC.TableEditor.getTableAncestors("incident");
 	var dictionary = new GlideRecord("sys_dictionary");
 	dictionary.orderBy("column_label");
@@ -32,12 +46,33 @@ MAG_Utils.getAllFields = function (tgt_table) {
 	dictionary.query();
 
 	while (dictionary.next()) {
+		var type = dictionary.getValue("internal_type");
+		var icon = "ℹ️";
+		
+		// MAG Temp fancy attempt -- Use 'Font Awesome' classes instead, if this goes ahead
+		if (type == "string") {
+			icon = "";
+		}
+		else if (type == "integer") {
+			icon = "#️⃣";
+		}
+		// date/time, reference, 
+		
 		allFields.push({
 			name: dictionary.getValue("element"),
 			label: dictionary.getDisplayValue(),
-			type: dictionary.getValue("internal_type")
+			type: dictionary.getValue("internal_type"),
+			icon: icon
 		});
 	}
+
+	// Need to manually add SysID
+	allFields.push({
+		name: "sys_id",
+		label: "Sys ID",
+		type: "sys_id",
+		icon: ""
+	});
 	
 	return allFields;
 };
@@ -46,13 +81,13 @@ MAG_Utils.getAllFields = function (tgt_table) {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-05-07 22:09:42</sys_created_on>
         <sys_id>8e735e8bdb6850108599656b4b96195b</sys_id>
-        <sys_mod_count>2</sys_mod_count>
+        <sys_mod_count>8</sys_mod_count>
         <sys_name>MAG_Utils</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sys_script_include_8e735e8bdb6850108599656b4b96195b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-05-10 14:26:39</sys_updated_on>
+        <sys_updated_on>2020-06-15 16:22:34</sys_updated_on>
     </sys_script_include>
 </record_update>

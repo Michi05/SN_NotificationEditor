@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_message">
+    <sys_ui_message action="INSERT_OR_UPDATE">
+        <application/>
+        <key>ACTION_SAVED_SUCCESS</key>
+        <language>en</language>
+        <message>Changes have been saved.</message>
+        <sys_class_name>sys_ui_message</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-06-15 22:09:01</sys_created_on>
+        <sys_id>57d9cf23db5d10108599656b4b9619ca</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>ACTION_SAVED_SUCCESS</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sys_ui_message_57d9cf23db5d10108599656b4b9619ca</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-06-15 22:09:01</sys_updated_on>
+    </sys_ui_message>
+</record_update>

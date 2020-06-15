@@ -59,10 +59,10 @@
 		copiable_text.remove();
 
 		if (copied){
-			spUtil.addInfoMessage("Copied to clipboard: " + text);
+			spUtil.addInfoMessage($scope.data.CONST.MSG.ACTION_CLIPBOARD_SUCCESS + ": " + text);
 		}
 		else
-			spUtil.addErrorMessage("Unable to copy: " + text);
+			spUtil.addErrorMessage($scope.data.CONST.MSG.ACTION_SAVED_ERROR + ": " + text);
 	};
 	
 	
@@ -71,21 +71,22 @@
 	///////////////////////////////////
 
 	c.saveRecord = function() {
-//		c.data.f._fields.subject.value = c.data.subject_content;
-//		c.data.f._fields.message_html.value = c.data.messageHTML_content;
-
 		c.data.mag = {
 			operation: "saveRecord",
-			usr_action: "saveRecord",
-			subject_content_new: c.data.subject_content,
-			messageHTML_content_new: c.data.messageHTML_content
+			usr_action: "saveRecord"
 		};
+		
+		// ToDo: [UX] Add a wait/clock/gray-out... while saving?!
 
-		spUtil.update($scope).then(function(resp) {
-			spUtil.addInfoMessage("Values have been saved!")
-			
-			// ToDo: send signal to "Preview" Widget to update in real time
+		// Receives a copy of Data on the call back
+		spUtil.update($scope).then(function(data_resp) {
+			// Alternative call == c.server.update().then(f...)
+
+			spUtil.addInfoMessage($scope.data.CONST.MSG.ACTION_SAVED_SUCCESS)
+
+			// ToDo: send signal to "Preview" Widget to update accordingly
 			// ToDo: And fix this whole thing altogether
+			// ToDo: EVEN MORE IMPORTANT; need to handle scopes!!
 		});
 	}
 }
@@ -413,8 +414,14 @@ div#EditableContent {
 		// Pre-populate the 'data' variable
 		///////////////////////////////////
 		data.f = {};
-		data.recordAddedMsg = gs.getMessage("Record Added");
-		data.updatedMsg = gs.getMessage("updated_uppercase");
+		data.CONST = {
+			MSG: {
+				ACTION_SAVED_SUCCESS: gs.getMessage("ACTION_SAVED_SUCCESS"),
+				ACTION_CLIPBOARD_SUCCESS: gs.getMessage("ACTION_CLIPBOARD_SUCCESS"),
+				ACTION_SAVED_ERROR: gs.getMessage("ACTION_SAVED_ERROR")
+
+			}
+		};
 
 		
 		//  var security_mgr = GlideSecurityManager.get();
@@ -520,7 +527,7 @@ div#EditableContent {
 			data.f.currentScopeLabel = gs.getCurrentApplicationName();
 		}
 
-		// MAG NOTE: I might need this if some Notifications have only text?
+		// MAG NOTE: May need this if some Notifications have only text?
 		//	data.messageHTML_content =
 		//		rec.getValue("message_html") || rec.getValue("message_text") || rec.getValue("message");
 		
@@ -545,14 +552,14 @@ div#EditableContent {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:18:12</sys_created_on>
         <sys_id>9d696959db1010108599656b4b9619f8</sys_id>
-        <sys_mod_count>116</sys_mod_count>
+        <sys_mod_count>130</sys_mod_count>
         <sys_name>MAG Notif Form</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_9d696959db1010108599656b4b9619f8</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-05-10 21:06:22</sys_updated_on>
+        <sys_updated_on>2020-06-15 22:52:27</sys_updated_on>
         <template><![CDATA[<div>
   <!-- readOnly due to scope -->
   <div ng-if="data.f.outOfScope" class="read-only-message">
