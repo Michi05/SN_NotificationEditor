@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_metadata_link">
+    <sys_metadata_link action="INSERT_OR_UPDATE">
+        <directory>unload</directory>
+        <documentkey>40e3cbf287f0030081bf2fb5e8cb0b9b</documentkey>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_script_include"&gt;
+    &lt;sys_script_include action="INSERT_OR_UPDATE"&gt;
+        &lt;access&gt;package_private&lt;/access&gt;
+        &lt;active&gt;true&lt;/active&gt;
+        &lt;api_name&gt;global.AccessHelper&lt;/api_name&gt;
+        &lt;caller_access/&gt;
+        &lt;client_callable&gt;false&lt;/client_callable&gt;
+        &lt;description/&gt;
+        &lt;name&gt;AccessHelper&lt;/name&gt;
+        &lt;script&gt;&lt;![CDATA[var AccessHelper = Class.create();
+AccessHelper.prototype = {
+    type: 'AccessHelper'
+};
+ 
+function PermissionException() {}
+ 
+AccessHelper.checkPermission = function(table, accessType, sysId) {
+                var gr = new GlideRecord(table);
+                var perm = true;
+				if(sysId) 
+					gr.get(sysId); 
+                if ( accessType == 'read' )
+                                perm = gr.canRead();
+                if ( accessType == 'write' )
+                                perm = gr.canWrite();
+                if ( accessType == 'create' )
+                                perm = gr.canCreate();
+                if ( accessType == 'delete' )
+                                perm = gr.canDelete();
+                if ( !perm )
+                                throw new PermissionException();
+                               
+};]]&gt;&lt;/script&gt;
+        &lt;sys_class_name&gt;sys_script_include&lt;/sys_class_name&gt;
+        &lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;
+        &lt;sys_created_on&gt;2017-08-29 12:20:20&lt;/sys_created_on&gt;
+        &lt;sys_id&gt;40e3cbf287f0030081bf2fb5e8cb0b9b&lt;/sys_id&gt;
+        &lt;sys_mod_count&gt;2&lt;/sys_mod_count&gt;
+        &lt;sys_name&gt;AccessHelper&lt;/sys_name&gt;
+        &lt;sys_package display_value="Project Portfolio Suite Portal" source="com.snc.pps_portal"&gt;12fb70fedb3700108599656b4b96198f&lt;/sys_package&gt;
+        &lt;sys_policy/&gt;
+        &lt;sys_scope display_value="Global"&gt;global&lt;/sys_scope&gt;
+        &lt;sys_update_name&gt;sys_script_include_40e3cbf287f0030081bf2fb5e8cb0b9b&lt;/sys_update_name&gt;
+        &lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;
+        &lt;sys_updated_on&gt;2019-03-29 06:46:29&lt;/sys_updated_on&gt;
+    &lt;/sys_script_include&gt;
+&lt;/record_update&gt;
+</payload>
+        <sys_class_name>sys_metadata_link</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-10 14:25:45</sys_created_on>
+        <sys_id>9da6cc4cdb7010108599656b4b9619a7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>AccessHelper</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sys_metadata_link_9da6cc4cdb7010108599656b4b9619a7</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-05-10 14:25:45</sys_updated_on>
+        <tablename>sys_script_include</tablename>
+    </sys_metadata_link>
+</record_update>

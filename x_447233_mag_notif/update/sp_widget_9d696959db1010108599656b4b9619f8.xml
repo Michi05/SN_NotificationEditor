@@ -82,27 +82,10 @@
 		};
 
 		spUtil.update($scope).then(function(resp) {
-			alert("Values have been saved!")
-			/*
-			{
-				updatedMsg: "Updated"
-				f: {}
-				attachmentUploadSuccessMsg: "Attachment upload was successful"
-				isAdmin: true
-				recordAddedMsg: "Record Added"
-				hideRelatedLists: false
-				exportPDFMsg: "Export to PDF"
-				largeAttachmentMsg: "Attached files must be smaller than 1024MB - please try again"
-				sys_id: "498162a20a0a0b4b00725fb9e5b6aeb3"
-				exportPDFLandMsg: "Export to PDF (landscape)"
-				view: "sp"
-				addAttachmentMsg: "Add an attachment"
-				attachmentSuccessMsg: "Attachment successfully uploaded"
-				maxAttachmentSize: 1024
-				table: "sysevent_email_action"
-				disableUIActions: false
-			}
-			*/
+			spUtil.addInfoMessage("Values have been saved!")
+			
+			// ToDo: send signal to "Preview" Widget to update in real time
+			// ToDo: And fix this whole thing altogether
 		});
 	}
 }
@@ -562,14 +545,14 @@ div#EditableContent {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:18:12</sys_created_on>
         <sys_id>9d696959db1010108599656b4b9619f8</sys_id>
-        <sys_mod_count>114</sys_mod_count>
+        <sys_mod_count>116</sys_mod_count>
         <sys_name>MAG Notif Form</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_9d696959db1010108599656b4b9619f8</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-05-10 11:35:02</sys_updated_on>
+        <sys_updated_on>2020-05-10 21:06:22</sys_updated_on>
         <template><![CDATA[<div>
   <!-- readOnly due to scope -->
   <div ng-if="data.f.outOfScope" class="read-only-message">
