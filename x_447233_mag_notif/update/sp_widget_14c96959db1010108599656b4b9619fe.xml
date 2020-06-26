@@ -27,20 +27,22 @@
 		setKeywords: 'data_table.setKeywords'
 	};
 	
+	if (c.data.mag || (c.data.mag = {})) // Ensure that .mag is initialized
+		c.data.mag.status = "initialised";
+		spUtil.update($scope).then(function(data_resp) {
+			spUtil.addTrivialMessage("Initialised");
+		});
+	
 	//// END init ////
 
 
-
+// TODO: Revise this
 	if (localFunctions && localFunctions.setAllWatchers)
 		spUtil = localFunctions.setAllWatchers($scope, spUtil, $scope.data.table, $scope.data.filter);
-	
-	
 	
 	// Makes Widget Async
 	$scope.loadingData = true;
 	$scope.server.update().then(function() {
-		if ($scope.data.newButtonUnsupported)
-			console.log("Service Portal: New button not supported for sys_attachment list");
 		$scope.loadingData = false;
 		if (localFunctions && localFunctions.setAllWatchers)
 			spUtil = localFunctions.setAllWatchers($scope, spUtil, $scope.data.table, $scope.data.filter);
@@ -177,10 +179,15 @@
 
 	$scope.setPageNum = function(num) {
 		$scope.data.p = num;
-		getData(true);
+		$scope.data.window_start  = (($scope.data.p - 1) * $scope.data.window_size);
+		$scope.data.window_end = ((($scope.data.p) * $scope.data.window_size));
+//		getData(true); // MAG: this was overriding my config; probably legacy now
 		$timeout(function() {
 			$scope.focusOnTableHeader();
 		});
+		
+		//MAG-TODO: Important to recalculate pages for filtered-down lists when searching
+		//And also worth adding a "No records found for search == ...." 
 	}
 
 	$scope.setOrderBy = function(field) {
@@ -193,14 +200,14 @@
 		}
 
 		if (d === "asc") {
-			spAriaUtil.sendLiveMessage($scope.data.msg.sortingByAsc);
+			spAriaUtil.sendLiveMessage($scope.data.CONST.MSG.sortingByAsc);
 		} else if (d === "desc") {
-			spAriaUtil.sendLiveMessage($scope.data.msg.sortingByDesc);
+			spAriaUtil.sendLiveMessage($scope.data.CONST.MSG.sortingByDesc);
 		}
 
 		$scope.data.o = field;
 		$scope.data.d = d;
-		$scope.setSearch(true);
+//		$scope.setSearch(true); // TODO: This is going to clash with the dynamic angular search implemented!!
 	}
 
 	$scope.setSearch = function(updateUrl) {
@@ -393,14 +400,15 @@
 
 	}
 
-	c.mag_selectItem = function(idx) {  
-		// Set the position indicator to the index value passed in on select
-		//		c.notePos = idx;
-		//		var id = c.data.notes[idx].sys_id;
-		//		console.log('Note ID: ' + id);
-		//		$rootScope.noteID = id;
-		//		$rootScope.$emit('selectNote', id);
-		console.log(idx);
+	$scope.changeRefreshList = function() {
+		if (c.data.ctrl || (c.data.ctrl = {})) // Ensure that .mag is initialized
+			c.data.ctrl.operation = "changeRefreshList";
+
+		spUtil.clear
+		spUtil.update($scope).then(function(data_resp) {
+			// Feedback if needed
+			spUtil.addTrivialMessage("New filter = " + $scope.data.filter)
+		});
 	}
 
 
@@ -424,7 +432,7 @@ var localFunctions = {
 		// TODO: set the 	$rootScope.data.main_filter = $scope.data.filter;
 		//and emit the result to the other widget
 		spUtil.recordWatch($scope, table, filter, function(watchRec) {
-			//		if(name.data.operation == "insert")
+			//		if(name.ctrl.operation == "insert")
 			//				c.server.refresh();
 			//				spUtil.update($scope);
 		});
@@ -603,6 +611,7 @@ tbody tr:last-child {
 //////////////////////////////////////////*/
 
 // Table selector
+/////////////////
 #select_trigger_table {
   margin-left: 1em;
   padding-left: 1em;
@@ -620,6 +629,13 @@ tbody tr:last-child {
 #select_trigger_table:focus {
   outline: none !important; 
   box-shadow: 0 0 -10px 0px lightgrey;
+}
+
+
+// Search box
+/////////////////
+input#keyword_search_box {
+    border-radius: 1em;
 }
 
 
@@ -648,6 +664,8 @@ tbody tr:last-child {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
+
 </css>
         <data_table>sp_instance_table</data_table>
         <demo_data>{"data":&#13;
@@ -806,64 +824,112 @@ tbody tr:last-child {
 	
 
 	try {
+		////////////////////////////////////////
+		// Default initialization, options, Input & CONST
+		////////////////////////////////////////
 		initializeDataObj();
-
-	//temp
-	data.trigger_table = "Incident";
+		
+		// Constants and Messages
+		data.CONST = {
+			MSG: {
+				sortingByAsc: gs.getMessage("Sorting by ascending"),
+				sortingByDesc: gs.getMessage("Sorting by descending")
+			}
+		};
 		
 		
+		////////////////////////////////////////
+		// Specific Initializations for Table level
+		////////////////////////////////////////
 		
-		
-		
+		// Mandatory inits checklist
+		// [x]		data.title // from Options
+		// [x]		data.table
+		// [x]		data.table_label
+		// [x]		data.table_plural
+		// [x]		data.invalid_table
+		// [ ]		data.list
+		// [x]		data.filter
+		// [x]		data.list_table_filter
+		// [ ]		data.trigger_table_list
+		// [x]		data.column_labels
+		// [x]		data.fields
+		// [x]		data.field_list // Options
+		// [x]		data.fields_array
+		// [x]		data.o // order // from Options
+		// [x]		data.d // direction // from Options
 
 		////////////////////////////////////////
-		// Deal w/ input, if any
-		////////////////////////////////////////
-
-		if (!input || input == {}) // asynch load list
-			return;
-
-
-
-
-		////////////////////////////////////////
-		// Setup the record and the query
-		////////////////////////////////////////
-		var grForMetaData = new GlideRecord(data.table);
-		var gr;
-
-		// FilteredGlideRecord is not supported in scoped apps, so GlideRecordSecure will always be used in an application scope
-		if (typeof FilteredGlideRecord != "undefined" && (gs.getProperty("glide.security.ui.filter") == "true" || grForMetaData.getAttribute("glide.security.ui.filter") != null)) {
-			gr = new FilteredGlideRecord(data.table);
-			gr.applyRowSecurity();
-		} else
-			gr = new GlideRecordSecure(data.table);
-
-
-
-		if (!gr.isValid()) {
+		// Set table and its name if Valid
+		//		var grCheckTable = new GlideRecordSecure(data.table);
+		data.table = "sysevent_email_action"; // Always Notifications
+		var grCheckTable = new GlideRecord(data.table);
+		if (!data.table || !grCheckTable.isValid()) {
 			data.invalid_table = true;
-			data.table_label = data.table;
-			return;
+			data.table_label = "-"; // data.table
+			return; // TODO: review if this check is needed
 		}
-
-		data.canCreate = gr.canCreate();
-		data.newButtonUnsupported = data.table == "sys_attachment";
-		data.hasTextIndex = $sp.hasTextIndex(data.table);
-		if (data.filter) {
-			if (data.filterACLs)
-				gr = $sp.addQueryString(gr, data.filter);
+		else {
+			data.table_label = grCheckTable.getLabel();
+			data.table_plural = grCheckTable.getED().getPlural();
+		}
+		
+		////////////////////////////////////////
+		// Set the fields to show
+		data.fields = data.field_list;
+		if (!data.fields) {
+			if (data.view)
+				data.fields = $sp.getListColumns(data.table, data.view);
 			else
-				gr.addEncodedQuery(data.filter);
+				data.fields = $sp.getListColumns(data.table);
 		}
-		if (data.keywords) {
-			gr.addQuery('123TEXTQUERY321', data.keywords);
-			data.keywords = null;
+		data.fields_array = data.fields.split(',');
+		//		data.fields_array = $sp.getListColumns(data.table, data.view).split(',');
+
+		
+		////////////////////////////////////////
+		// use GlideRecord to get field labels vs. GlideRecordSecure (failing in Scope)
+		data.column_labels = {};
+		for (var i in data.fields_array) {
+			var field = data.fields_array[i];
+			var fieldElement = grCheckTable.getElement(field);
+			if (fieldElement != null)
+				data.column_labels[field] = fieldElement.getLabel();
+			else
+				data.column_labels[field] = "-";
 		}
 
-		data.filter = gr.getEncodedQuery();
-		if (data.trigger_table)
-			data.filter = "collection=" + data.trigger_table + "^" + gr.getEncodedQuery();
+
+		////////////////////////////////////////
+		// Setup the GR record and the query (filters, conditions, order)
+		////////////////////////////////////////
+		var listRecords;
+		data.trigger_table_list = initializeTableChoices() || [];
+		data.hasTextIndex = $sp.hasTextIndex(data.table);
+		data.trigger_table = data.trigger_table || "Incident"; // Default if empty
+		data.filter = "collection=" + data.trigger_table;// + "^" + data.initial_filter;
+
+		/* MAG-TODO: Apply some alternative security */
+		// FilteredGlideRecord is not supported in scoped apps, so GlideRecordSecure will always be used in an application scope
+		if (typeof FilteredGlideRecord != "undefined"
+				&& (gs.getProperty("glide.security.ui.filter") == "true"
+						|| grCheckTable.getAttribute("glide.security.ui.filter") != null)) {
+			listRecords = new FilteredGlideRecord(data.table);
+			listRecords.applyRowSecurity();
+		} else
+			listRecords = new GlideRecordSecure(data.table);
+		
+
+			if (data.filterACLs)
+				listRecords = $sp.addQueryString(listRecords, data.filter);
+			else
+				listRecords.addEncodedQuery(data.filter);
+
+		//		if (data.keywords) {
+//			listRecords.addQuery('123TEXTQUERY321', data.keywords);
+//			data.keywords = null;
+//		}
+
 
 
 		if (data.relationship_id) {
@@ -873,54 +939,51 @@ tbody tr:last-child {
 			applyTo.get("sys_id", data.apply_to_sys_id);
 			rel.queryWith(applyTo, target); // put the relationship query into target
 			data.exportQuery = target.getEncodedQuery();
-			gr.addEncodedQuery(data.exportQuery); // get the query the relationship made for us
+			listRecords.addEncodedQuery(data.exportQuery); // get the query the relationship made for us
 		}
 		if (data.exportQuery)
 			data.exportQuery += '^' + data.filter;
 		else
 			data.exportQuery = data.filter;
 		data.exportQueryEncoded = encodeURIComponent(data.exportQuery);
+		
+		
+		// Order and direction
 		if (data.o){
 			if (data.d == "asc")
-				gr.orderBy(data.o);
+				listRecords.orderBy(data.o);
 			else
-				gr.orderByDesc(data.o);
+				listRecords.orderByDesc(data.o);
 			if (gs.getProperty("glide.secondary.query.sysid") == "true")
-				gr.orderBy("sys_id");
+				listRecords.orderBy("sys_id");
 		}
-		gr.chooseWindow(data.window_start, data.window_end);
-		gr._query();
+//		listRecords.chooseWindow(data.window_start, data.window_end);
+		listRecords._query();
 
-		data.row_count = gr.getRowCount();
+		data.canCreate = listRecords.canCreate();
+		data.row_count = listRecords.getRowCount();
 		data.num_pages = Math.ceil(data.row_count / data.window_size);
 
+		
+		////////////////////////////////////////
+		// Put the list of records together
 		data.list = [];
-		while (gr._next()) {
+		while (listRecords._next()) {
 			var record = {};
-			$sp.getRecordElements(record, gr, data.fields);
-			if (typeof FilteredGlideRecord != "undefined" && gr instanceof FilteredGlideRecord) {
-				// FilteredGlideRecord doesn't do field-level
-				// security, so take care of that here
-				for (var f in data.fields_array) {
-					var fld = data.fields_array[f];
-					if (!gr.isValidField(fld))
-						continue;
-
-					if (!gr[fld].canRead()) {
-						record[fld].value = null;
-						record[fld].display_value = null;
-					}
-				}
-			}
-			record.sys_id = gr.getValue('sys_id');
-			record.targetTable = gr.getRecordClassName();
+			$sp.getRecordElements(record, listRecords, data.fields);
+			record.sys_id = listRecords.getValue('sys_id');
+			record.targetTable = listRecords.getRecordClassName();
 			data.list.push(record);
 		}
 
-		data.enable_filter = (input.enable_filter == true || input.enable_filter == "true" ||
-													options.enable_filter == true || options.enable_filter == "true");
+
+
+
+		////////////////////////////////////////
+		// Setup the breadcrumbs from table & Widget
+		data.enable_filter = (data.enable_filter.toString() === "true"); // Str to Bool
 		var breadcrumbWidgetParams = {
-			table: data.table,
+			table: data.table, // List table == Notification (not trigger table)
 			query: data.filter,
 			enable_filter: data.enable_filter
 		};
@@ -928,48 +991,7 @@ tbody tr:last-child {
 		
 		
 		
-
 		
-		
-		
-		////////////////////////////////////////
-		// Load list of tables for selecting
-		////////////////////////////////////////
-		// TODO: remove all the useless "returns" to arrive here for sure unless there's a serious exception
-		
-		data.trigger_table_list = [];
-		if (data.table) {
-			var collection_groups = new GlideAggregate(data.table);
-			collection_groups.addAggregate('count');
-			collection_groups.addAggregate('count', 'collection');
-			//			collection_groups.addAggregate('count(distinct','collection');
-			//			collection_groups.addQuery("active", true);
-			
-			collection_groups.addQuery("message_htmlISNOTEMPTY");
-			
-			// TODO: generate a property with all Task tables by Default:
-			/* if (!gs.getProperty("")){
-				var tables = (...aggregate...)
-				var task_tables = new GlideRecord(dictionary);
-				task_tables.name in tables
-				AND task_tables.extends == task
-				
-				return all task_tables
-			}
-			*/
-
-			collection_groups.groupBy('collection');
-			collection_groups.query();
-			while (collection_groups.next()) {
-				if (collection_groups.getAggregate('count', 'collection') > 4) // TODO: change this joke... :) 
-				data.trigger_table_list.push({
-					value: collection_groups.getValue('collection'),
-					displayValue: collection_groups.getDisplayValue('collection') || "All" // Empty == All tables
-				})
-			}
-
-//			data.trigger_table_count = collection_groups.getAggregate('count(distinct','collection');
-		}
 		
 			
 			
@@ -1004,8 +1026,8 @@ tbody tr:last-child {
 	function initializeDataObj() {
 		/*  "use strict"; - linter issues */	
 		/*
-	 ******* Populate the DATA object ********
-	 * data.table = the table
+	 ******* DATA object Documentation ********
+	 * data.table = records' table (Notifications OR Templates)
 	 * data.p = the current page starting at 1
 	 * data.o = the order by column
 	 * data.d = the order by direction
@@ -1017,7 +1039,7 @@ tbody tr:last-child {
 	 * data.fields = a comma delimited list of field names to show in the data table
 	 * data.column_labels = a map of field name -> display name
 	 * data.window_size = the number of rows to show
-	 * data.filter = the encoded query
+	 * data.initial_filter = the encoded query
 	 */
 
 		//MAG precedence of inputs reminder:
@@ -1029,7 +1051,7 @@ tbody tr:last-child {
 		// Set Default values of DATA
 		data.table = data.table || $sp.getParameter("t") || $sp.getParameter("table") || $sp.getParameter("sl_table") || options.table;
 		data.sys_id = data.sys_id || $sp.getParameter("sys_id") || $sp.getParameter("sl_sys_id") || options.sys_id;
-		data.filter = $sp.getParameter('filter') || $sp.getValue('filter') || data.filter;
+		data.initial_filter = $sp.getParameter('filter') || $sp.getValue('filter') || data.initial_filter;
 		data.keywords = data.keywords || $sp.getValue('keywords');
 		data.p = data.p || $sp.getValue('p') || 1;
 		data.p = parseInt(data.p);
@@ -1054,59 +1076,58 @@ tbody tr:last-child {
 
 
 
-		// Setup the DATA object from OPTIONS	
-		optCopy(['table', 'p', 'o', 'd', 'filter', 'filterACLs', 'fields', 'keywords', 'view']);
-		optCopy(['relationship_id', 'apply_to', 'apply_to_sys_id', 'window_size']);
+		////////////////////////////////////////
+		// Setup the DATA object from OPTIONS and deal w/ INPUT, if any
+		////////////////////////////////////////
+		optCopy(['table', 'p', 'o', 'd', 'filterACLs', 'fields', 'keywords', 'view']);
+		optCopy(['relationship_id', 'apply_to', 'apply_to_sys_id', 'window_size', 'enable_filter']);
 		optCopy(['field_list', 'view', 'title', 'show_breadcrumbs', 'trigger_table']);
-
-
-		// Check Table and Fields to show
-		//		var grCheckTable = new GlideRecordSecure(data.table);
-		var grCheckTable = new GlideRecord(data.table);
-		if (!data.table || !grCheckTable.isValid()) {
-			data.invalid_table = true;
-			data.table_label = "-";
-			return;
-		}
-		else {
-			data.table_label = grCheckTable.getLabel();
-			data.table_plural = grCheckTable.getED().getPlural();
-		}
-
-
-
-		data.fields = data.field_list;
-		if (!data.fields) {
-			if (data.view)
-				data.fields = $sp.getListColumns(data.table, data.view);
-			else
-				data.fields = $sp.getListColumns(data.table);
-		}
-
-
-
-		data.fields_array = data.fields.split(',');
-		//		data.fields_array = $sp.getListColumns(data.table, data.view).split(',');
-
-		// use GlideRecord to get field labels vs. GlideRecordSecure
-		data.column_labels = {};
-		for (var i in data.fields_array) {
-			var field = data.fields_array[i];
-			var fieldElement = grCheckTable.getElement(field);
-			if (fieldElement != null)
-				data.column_labels[field] = fieldElement.getLabel();
-			else
-				data.column_labels[field] = "-";
-		}
-
-
-
-		data.msg = {
-			sortingByAsc: gs.getMessage("Sorting by ascending"),
-			sortingByDesc: gs.getMessage("Sorting by descending")
-		};
+		
 
 		return data;
+	}
+	
+
+	////////////////////////////////////////
+	// Receive a table (either Notifications or Templates)
+	// Returns a list of tables for selecting
+	////////////////////////////////////////
+	function initializeTableChoices(notifications_table){
+		var trigger_table_list = [];
+		notifications_table = notifications_table || "sysevent_email_action"; // Default
+		
+		var collection_groups = new GlideAggregate(notifications_table);
+		collection_groups.addAggregate('count');
+		collection_groups.addNotNullQuery('collection');
+		collection_groups.addAggregate('count','collection');
+		collection_groups.groupBy('collection');
+//		collection_groups.addActiveQuery();
+		collection_groups.addQuery("message_htmlISNOTEMPTY");// MAG-TODO: this is temp
+		//			collection_groups.addAggregate('count(distinct','collection');
+		//			collection_groups.addQuery("active", true);
+
+
+		// TODO: generate a property with all Task tables by Default:
+		/* if (!gs.getProperty("")){
+				var tables = (...aggregate...)
+				var task_tables = new GlideRecord(dictionary);
+				task_tables.name in tables
+				AND task_tables.extends == task
+
+				return all task_tables
+			}
+			*/
+		collection_groups.query();
+		
+		while (collection_groups.next()) {
+			if (collection_groups.getAggregate('count', 'collection') > 4) // MAG-TODO: change this joke... :)
+				trigger_table_list.push({
+					value: collection_groups.getValue('collection'),
+					displayValue: collection_groups.getDisplayValue('collection') || "All" // Empty == All tables
+				})
+		}
+		//			trigger_table_count = collection_groups.getAggregate('count(distinct','collection');
+		return trigger_table_list;
 	}
 
 })($sp, input, data, options, gs);]]></script>
@@ -1115,14 +1136,14 @@ tbody tr:last-child {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:19:46</sys_created_on>
         <sys_id>14c96959db1010108599656b4b9619fe</sys_id>
-        <sys_mod_count>59</sys_mod_count>
+        <sys_mod_count>126</sys_mod_count>
         <sys_name>MAG Notif List View</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_14c96959db1010108599656b4b9619fe</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-05-10 11:33:27</sys_updated_on>
+        <sys_updated_on>2020-06-26 00:17:44</sys_updated_on>
         <template><![CDATA[<style>
   table #list_item_{{data.sys_id}} {
 
@@ -1171,10 +1192,13 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
 -->
     <span class="panel-title">
       <i ng-if="options.glyph" class="fa fa-{{options.glyph}} m-r"></i>{{data.title}}
-      <select id="select_trigger_table" class="input_field" required>
+      <select id="select_trigger_table"
+              class="input_field"
+              ng-model=data.trigger_table
+              ng-change="changeRefreshList()" required>
         <option value="{{data.trigger_table}}" selected>{{data.trigger_table}}</option>
-        <option ng-repeat="table in ::data.trigger_table_list" value="{{::table.value}}">
-          {{::table.value}}
+        <option ng-repeat="table in data.trigger_table_list" value="{{table.value}}">
+          {{table.value}}
         </option>
         <option value="">All</option>
       </select>
@@ -1185,14 +1209,17 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
     
     <!-- New -->
     <button name="new" role="button" class="btn btn-primary btn-sm m-l-xs"
-            ng-click="newRecord()" ng-if="options.show_new && data.canCreate && !data.newButtonUnsupported"
+            ng-click="newRecord()" ng-if="options.show_new && data.canCreate"
             aria-label="${Create new record}">${New}</button>
     
     <!-- Search -->
     <div class="pull-right" > <!-- ng-if="options.show_keywords -->
-      <form ng-if="data.hasTextIndex" ng-submit="setSearch(true)">
+      <form ng-if="data.hasTextIndex"
+            id="keyword_search"
+            class="search_box"
+            ng-submit="setSearch(true)"> <!-- Probably remove onSubmit, but double-testing -->
         <div class="input-group">
-          <input type="text" name="datatable-search" ng-model="data.keywords" ng-model-options="{debounce:250}" class="form-control" placeholder="${Keyword Search}" aria-label="${Keyword Search}">
+          <input type="text" id="keyword_search_box" class="search_box" name="datatable-search" ng-model="data.keywords" ng-model-options="{debounce:250}" class="form-control" placeholder="${Keyword Search}" aria-label="${Keyword Search}">
         </div>
         
       </form>
@@ -1229,7 +1256,7 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="item in data.list | subjectContains: data.keywords as results track by item.sys_id"
+        <tr ng-repeat="item in data.list | subjectContains : data.keywords | orderBy : 'subject.display_value' : (data.d == 'desc' ) | limitTo : data.window_size : data.window_start track by item.sys_id"
             id="list_item_{{item.sys_id}}">
           <td role="cell"
               class="pointer sp-list-cell"
@@ -1246,17 +1273,17 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
               {{::item[field].display_value | limitTo : item[field].limit}}{{::item[field].display_value.length > item[field].limit ? '...' : ''}}
             </span>
             <span ng-if="!$first">
-               -->
-              {{::item[field].display_value}}
+
+
+        <tr ng-repeat="item in data.list | subjectContains : data.keywords as results track by item.sys_id | limitTo : 3"
+-->
+              {{item[field].display_value}}
             </span>
           </td>
         </tr>
       </tbody>
     </table>
     
-    <!-- TODO:
-Fix pagination to allow dynamic filtering instead
-   -->
     <div ng-class="{'pruned-msg-filter-pad': (!options.show_breadcrumbs || !data.filter) && !data.list.length}" class="pruned-msg" ng-if="rowsWerePruned()">
       <span ng-if="rowsPruned == 1">${{{rowsPruned}} row removed by security constraints}</span>
       <span ng-if="rowsPruned > 1">${{{rowsPruned}} rows removed by security constraints}</span>
@@ -1264,6 +1291,9 @@ Fix pagination to allow dynamic filtering instead
   </div>
   
   
+    <!-- TODO:
+Fix pagination to allow dynamic filtering instead
+   -->
   
   <!-- footer -->
   <div class="panel-footer" ng-hide="options.hide_footer" ng-if="data.row_count">

@@ -422,6 +422,15 @@ div#EditableContent {
 
 			}
 		};
+		
+		// Initialize MAG
+		data.mag = data.mag || {};
+		data.mag.info = {
+			app: gs.getCurrentApplicationId(),
+			scope: gs.getCurrentScopeName(),
+			callerScope: gs.getCallerScopeName(), // Caller == This Script
+			sessionID: gs.getSessionID()
+		};
 
 		
 		//  var security_mgr = GlideSecurityManager.get();
@@ -459,22 +468,36 @@ div#EditableContent {
 		///////////////////////////////////
 		// Use values from 'input'
 		///////////////////////////////////
-		if (input) {
+		if (input && input.f && input.f._fields) {
 			// input == c.data on client
 			input.table = input.table || data.table;
 			input.sys_id = input.sys_id || data.sys_id;
 
 			if (input.mag && input.mag.usr_action == "saveRecord") {
+				// TODO: Save record using Event
+
+				data.mag.info.global_info = global.NotificationEditorUtils.getGlobalDetails(gs.getCurrentApplicationId(), rec);
+				// gs.eventQueue("x_447233_mag_notif.myTest", rec);
+				// var updateTriggered = global.NotificationEditorUtils.applyChanges(rec);
+
 				var result = $sp.saveRecord(input.table, input.sys_id, input.f._fields);
-				data.sys_id = result.sys_id;
+				data.sys_id = result.sys_id; // For creation
+				data.table = result.getRecordClassName() || input.table;
+				// Table set in case that Input is different AND
+				// in the weird instance that the record is auto-triaged to a Child table
 			}
 
 			if (input.sys_id == "-1") {
 				data.isNewRecord = true;
 				return;
 			}
+			
+			// Prevent reinitialising everything every time?
+			return; // TODO: Review this and probably move to the top
 		}
 
+		
+		
 		///////////////////////////////////
 		// Pick up the target record
 		///////////////////////////////////
@@ -482,59 +505,40 @@ div#EditableContent {
 		data.isTargetValid = null;
 		data.preview_url = null;
 
-		var rec = null;
+		var rec = $sp.getRecord();
 		// rec = $sp.getRecord(data.table, data.sys_id);
-		rec = $sp.getRecord();
 		//			rec = new GlideRecord(data.table);
 
 		if (!rec || !rec.isValid() || data.sys_id == -1){	
 			gs.warn("NOTIFs Widget::Form: Finished early with invalid table or ID");
 			return;
 		}
-		// LEGACY: Check if Sys_id having the right "shape"
-//		var sys_id_str = (data.sys_id || "").toString();
-		//		if (sys_id_str.match(/^\w{32}$/) != null)
-	
-		
-		// For extensions, I suppose??:
-		//	data.table = rec.getRecordClassName();
-		//	data.tableHierarchy = GlideDBObjectManager.getTables(data.table)
-		//		.toArray()
-		//		.join();
-
-		
+				
 		///////////////////////////////////
-		// Confirmed record. Setup the form
+		// Confirmed record. Setup the fields and the form
 		///////////////////////////////////
 
+		data.table = rec.getRecordClassName(); // Handling child tables, I suppose?
 		data.table_tmce = data.table + "_tmce";
 		data.isTargetValid = true;
-		data.canWrite = rec.canWrite();
-		var hasRecordAccess = data.sys_id == "-1" ? rec.canCreate() : data.canWrite;
+		
 		data.f = $sp.getForm(data.table, data.sys_id, data.query, data.view);
 
-		///////////////////////////////////
-		// Scope Checks (NOT Working)
-		///////////////////////////////////
-
-		// Show message when record is in cross app scope
-		// ERROR: Function isInSelectedScope is not allowed in scope x_447233_mag_notif
-		data.f.outOfScope = false; // TODO: !rec.isInSelectedScope();
-		// Populate scope labels only when needed
-		if (data.f.outOfScope) {
-			//Function getScopeLabelByRecordId is not allowed in scope
-			data.f.recordScopeLabel = gs.getScopeLabelByRecordId(rec.getUniqueValue());
-			data.f.currentScopeLabel = gs.getCurrentApplicationName();
-		}
+		data.f.canWrite =  // If ACLs allow OR role is Notification Manager
+			(data.sys_id == "-1" ? rec.canCreate() : rec.canWrite()) ||
+			gs.hasRole("x_447233_mag_notif.Notification Manager");
+		
+		// TODO: Add check for Protection Policy and some message-feedback to let the user know the reason if !canWrite
 
 		// MAG NOTE: May need this if some Notifications have only text?
 		//	data.messageHTML_content =
 		//		rec.getValue("message_html") || rec.getValue("message_text") || rec.getValue("message");
 		
+		// TODO: Watch out, the template doesn't seem to show for End Users
 		
 		
 		///////////////////////////////////
-		// Create the list of fields to use in the eMail
+		// Generate list of fieldss to use as variables
 		///////////////////////////////////
 		if (data.f && data.f._fields && data.f._fields.collection){
 			var allFields = MAG_Utils.getAllFields(data.f._fields.collection.value);
@@ -552,14 +556,14 @@ div#EditableContent {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:18:12</sys_created_on>
         <sys_id>9d696959db1010108599656b4b9619f8</sys_id>
-        <sys_mod_count>130</sys_mod_count>
+        <sys_mod_count>153</sys_mod_count>
         <sys_name>MAG Notif Form</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_9d696959db1010108599656b4b9619f8</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-06-15 22:52:27</sys_updated_on>
+        <sys_updated_on>2020-06-26 16:19:01</sys_updated_on>
         <template><![CDATA[<div>
   <!-- readOnly due to scope -->
   <div ng-if="data.f.outOfScope" class="read-only-message">
@@ -664,7 +668,7 @@ class="kb-comment-input" id="comment">
                class="form-control input_field"
                maxlength="254"
                data-type="text"
-               ng-readonly="data.f._fields.subject.readonly"
+               ng-readonly="!::data.f.canWrite"
                ng-attr-placeholder=""
                type="text"
                ng-model="data.f._fields.subject.value">
@@ -686,7 +690,7 @@ class="kb-comment-input" id="comment">
                          field="::data.f._fields.message_html"
                          record-table-name="::data.table_tmce"
                          aria-labelledby="aria-labelledby"
-                         ng-readonly="data.f._fields.message_html.readonly"
+                         ng-readonly="!::data.f.canWrite"
                          ng-model-options="{}"
                          ng-model="data.f._fields.message_html.value"
                          id="MessageHTMLBox">
