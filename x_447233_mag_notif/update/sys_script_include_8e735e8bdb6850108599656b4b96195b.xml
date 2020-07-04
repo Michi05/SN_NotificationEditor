@@ -15,6 +15,16 @@ MAG_Utils.prototype = {
 	type: 'MAG_Utils'
 };
 
+
+MAG_Utils.shortenString = function (target_str, max_length) {
+	target_str = target_str.toString();
+//	max_length = max_length || gs.getProperty("mag.link_beautifier.shortening.max_length", 83); // TODO: create a property for it
+	if(target_str.length < max_length)
+		return target_str;
+	var half_way_chars = (max_length-3)/2;
+	return target_str.slice(0, half_way_chars) + "..." +  target_str.slice(-half_way_chars);
+};
+
 MAG_Utils._getUtilsGLOBAL = function () {
 	try {
 		if (gs.nil(global.NotificationEditorUtils))
@@ -81,13 +91,13 @@ MAG_Utils.getAllFields = function (tgt_table) {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-05-07 22:09:42</sys_created_on>
         <sys_id>8e735e8bdb6850108599656b4b96195b</sys_id>
-        <sys_mod_count>8</sys_mod_count>
+        <sys_mod_count>10</sys_mod_count>
         <sys_name>MAG_Utils</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sys_script_include_8e735e8bdb6850108599656b4b96195b</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-06-15 16:22:34</sys_updated_on>
+        <sys_updated_on>2020-07-04 19:15:52</sys_updated_on>
     </sys_script_include>
 </record_update>

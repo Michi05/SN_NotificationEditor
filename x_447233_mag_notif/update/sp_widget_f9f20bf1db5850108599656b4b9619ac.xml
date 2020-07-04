@@ -10,6 +10,8 @@
 	$scope.errorMessages = [];
   
   
+	$scope.updatePreview = function() {
+	}
 } ]]></client_script>
         <controller_as>c</controller_as>
         <css>
@@ -35,7 +37,7 @@ section#contentPreviewArea, section#contentPreviewArea &gt; * {
 }
 
 /* Keeping the Preview Panel title on top-center */
-h3.panel-title {
+.panel-title {
   text-align: center;
   margin-left: auto;
   margin-right: auto;
@@ -46,106 +48,235 @@ h3.panel-title {
   padding: 0.5em;
   border-radius: 2em;
   background: #f9fffd;
-  width: 30%;
+  width: 60%;
   min-width: fit-content;
+  
 }
+
+
+/* Preview record selector */
+#select_preview_record {
+  min-width: max-content;
+  max-width:
+  border: 0;
+  border-radius: 1em;
+  text-decoration: underline;
+  box-shadow: 0 0 5px 0px lightgrey;
+  background: transparent;
+
+  padding: 0 1em;
+  margin: 0 1em;
+}
+
 </css>
         <data_table>sp_instance</data_table>
         <demo_data/>
         <description/>
         <docs/>
-        <field_list/>
+        <field_list>title,glyph</field_list>
         <has_preview>false</has_preview>
         <id>mag_notif_preview</id>
         <internal>false</internal>
         <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
         <name>MAG Notif Preview</name>
-        <option_schema/>
+        <option_schema>[{"name":"filter","section":"Data","label":"Filter preview records","type":"string"}]</option_schema>
         <public>false</public>
         <roles/>
         <script><![CDATA[// form functionality - URL parameter driven
 (function($sp, input, data, options, gs) {
 	/* "use strict"; -linter issues */
-	
-	
-	
-	///////////////////////////////////
-	// Pre-populate the 'data' variable
-	///////////////////////////////////
-	data.f = {};
-	data.recordAddedMsg = gs.getMessage("Record Added");
-	data.updatedMsg = gs.getMessage("updated_uppercase");
-	data.process_msg = "Data obj2 Initialized";
+	try {
 
-	
-	data.table = data.table || $sp.getParameter("t") || $sp.getParameter("table") || $sp.getParameter("sl_table") || options.table;
-	data.sys_id = data.sys_id || $sp.getParameter("sys_id") || $sp.getParameter("sl_sys_id") || options.sys_id;
-	if (!data.sys_id && options.sys_id_required != "true")
-		data.sys_id = "-1";
-	data.view = options.view || $sp.getParameter("view") || $sp.getParameter("v"); // no default
 
-	
-	
-	
-	
+		///////////////////////////////////
+		// Pre-populate the 'data' variable
+		///////////////////////////////////
+		data.f = {};
+		data.CONST = {
+			MSG: {
+				CONFIRM_RECORD_ADDED: gs.getMessage("Record Added"),
+				CONFIRM_UPDATE: gs.getMessage("updated_uppercase"),
+				WARN_NO_RECORDS: "--" + gs.getMessage("No records available") + "--"
+			}
+		};
+		options.display_value_max = options.display_value_max || 40;
+		options.preview_options_max = options.preview_options_max || 30;
 
-	///////////////////////////////////
-	// Generate values for the Preview (ToDo!)
-	///////////////////////////////////
-	
-	data.preview_record = "1c741bd70b2322007518478d83673af3";
-//	data.preview_record = new GlideRecord(...) // orderByDesc updated
-	
-	data.preview_event = "";
-//	data.preview_event = new GlideRecord(...) // orderByDesc updated
-	
-	
-	
-	var sys_id_str = (data.sys_id || "").toString();
-	if (sys_id_str.match(/^\w{32}$/) != null) {
-		data.isTargetValid = true;
-		data.preview_url =
-			"notification_preview_html_body.do?sysparm_record_id="
-			+ data.preview_record
-			+ "&sysparm_user_id=" + "6816f79cc0a8016401c5a33be04be441"
+
+		///////////////////////////////////
+		// Load main record: notification definition
+		///////////////////////////////////
+
+		var rec = $sp.getRecord();
+		if (rec || !rec.isValid()){
+			data.table = data.table || $sp.getParameter("t") || $sp.getParameter("table") || $sp.getParameter("sl_table") || options.table;
+			data.sys_id = data.sys_id || $sp.getParameter("sys_id") || $sp.getParameter("sl_sys_id") || options.sys_id;
+
+//			rec = $sp.getRecord(data.table, data.sys_id);
+
+			if (!rec || !rec.isValid()){
+				gs.warn("NOTIFs Widget::Form: Finished early with invalid table or ID");
+				return;
+			}
+		}
+
+
+
+		///////////////////////////////////
+		// Generate preview options
+		///////////////////////////////////
+
+		
+		// Records
+		///////////////////////////////////
+		data.trigger_table = rec.getValue("collection") || "incident";
+		var trigger_event = rec.getValue("event_name");
+		data.trigger_type = rec.getValue("generation_type");
+		var preview_items_gr = data.preview_event = data.preview_record = "";
+		var preview_items = [];
+		
+//		if (data.trigger_type == "event") {
+//			preview_items_gr = new GlideRecord("sysevent");
+//			preview_items_gr.addQuery("name", trigger_event);
+//		}
+//		else {
+//			preview_items_gr= new GlideRecord(data.trigger_table);
+//		}
+		
+		preview_items_gr= new GlideRecord(data.trigger_table); // as per above
+		preview_items_gr.setLimit(options.preview_options_max);
+		preview_items_gr.orderBy(preview_items_gr.getDisplayName());
+		
+		//TODO: Or set a time-limit instead?!
+//		preview_items_gr.orderBy(preview_items_gr.getDisplayName());
+		preview_items_gr.query();
+
+		while (preview_items_gr.next()) {
+			preview_items.push({
+				display_value: MAG_Utils.shortenString(preview_items_gr.getDisplayValue(), options.display_value_max),
+				value: preview_items_gr.getUniqueValue(),
+				sys_updated_on: preview_items_gr.getValue("sys_updated_on"),
+				sys_created_on: preview_items_gr.getValue("sys_created_on")
+			});
+		}
+
+
+		data.preview_list = preview_items;
+		data.isTargetValid = !gs.nil(preview_items[0]); // = !gs.nil(data.preview_record);
+		if (data.isTargetValid) {
+			if (data.trigger_type == "event") {
+				data.preview_record = preview_items[0]; // Change back to 'preview_event' when it works
+			}
+			else {
+				data.preview_record = preview_items[0];
+			}
+		}
+
+
+		// TODO: This will be calculated in the client when the ng-models are updated
+		data.preview_url = "notification_preview_html_body.do?"
+			+ "sysparm_user_id=" + "6816f79cc0a8016401c5a33be04be441"
 			+ "&sysparm_event_id=" + data.preview_event
 			+ "&sysparm_notification_id=" + data.sys_id
 			+ "&sysparm_changed_fields="
 			+ "&sys_target=sysevent_email_action"
-			+ "&sys_uniqueValue=" + data.sys_id;
+			+ "&sys_uniqueValue=" + data.sys_id
+			+ "&sysparm_record_id="; // Plus the preview record!
 
 
 	}
+	catch (main_err) {
+		gs.error("NOTIFs Widget::Form: " + main_err.name + " \n >> " + main_err.message);
+	}
+
 })($sp, input, data, options, gs);]]></script>
         <servicenow>false</servicenow>
         <sys_class_name>sp_widget</sys_class_name>
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-21 18:06:30</sys_created_on>
         <sys_id>f9f20bf1db5850108599656b4b9619ac</sys_id>
-        <sys_mod_count>27</sys_mod_count>
+        <sys_mod_count>80</sys_mod_count>
         <sys_name>MAG Notif Preview</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_f9f20bf1db5850108599656b4b9619ac</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-06-26 16:12:13</sys_updated_on>
+        <sys_updated_on>2020-07-04 22:22:06</sys_updated_on>
         <template><![CDATA[<div>
   
   <!--
 // TODO: On SUBJECT preview: Replace /${(w+)}/ for data.f._fields[(1)}
 // Can use a pipe directive for this! :)input._fields
+
+              ng-change="changeRefreshList()" 
 -->
   <section id="contentPreviewArea" ng-if="data.preview_url">
     <div class="panel-heading"
          ng-hide="options.hide_header"
          ng-if="data.preview_url"
          aria-hidden="false">
-      <h3 class="panel-title" >Preview pane</h3>
+      
+    <!-- Message IF no records -->
+      <h3 class="panel-title"
+           ng-if="!data.isTargetValid">{{data.CONST.MSG.WARN_NO_RECORDS}}
+      </h3>
+      
+    <!-- Select Record IF any available -->
+      <h3 class="panel-title"
+          ng-if="data.isTargetValid">
+        <i ng-if="::options.glyph" class="fa fa-{{::options.glyph}} m-r"></i>
+        {{::options.title}}
+        
+        
+        
+        <select id="select_preview_record"
+                class="input_field"
+                ng-model=data.preview_record required>
+          <option ng-repeat="rec in data.preview_list" value="{{rec.value}}">
+            {{rec.display_value}}
+          </option>
+        </select>
+
+        
+        
+    <!--
+        <select id="select_preview_record"
+                class="input_field"
+                ng-if="::data.trigger_type=='event'"
+                ng-model=data.preview_event required>
+          <option ng-repeat="rec in data.preview_list" value="{{rec.value}}">
+            {{rec.sys_updated_on}}
+          </option>
+        </select>
+-->
+      
+      
+      </h3>
+      
+
+
+    <!--
+// TODO: the below needs work but would allow typeahead-search for records
+
+        <input type="text" list="recs" id="contentPreviewArea"
+               name="contentPreviewArea"
+                class="input_field" />
+        <datalist id="recs">
+          <option ng-repeat="rec in data.preview_list" value="{{rec.value}}">
+            {{rec.display_value}}
+          </option>
+          <option value="">All</option>
+        </datalist>
+-->
+
     </div>  
 
-  
-    <iframe src="{{data.preview_url}}"
+
+    <!--
+// TODO: iframe will be substituted by "NotificationSimulator" when that's implemented
+-->
+    <iframe src="{{(data.preview_url.toString() + data.preview_record.toString())}}"
             id="simulated_html_iframe"
             title="HTML Body Preview">
     </iframe>

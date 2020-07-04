@@ -404,7 +404,7 @@
 		if (c.data.ctrl || (c.data.ctrl = {})) // Ensure that .mag is initialized
 			c.data.ctrl.operation = "changeRefreshList";
 
-		spUtil.clear
+//		spUtil.clear
 		spUtil.update($scope).then(function(data_resp) {
 			// Feedback if needed
 			spUtil.addTrivialMessage("New filter = " + $scope.data.filter)
@@ -634,9 +634,19 @@ tbody tr:last-child {
 
 // Search box
 /////////////////
-input#keyword_search_box {
-    border-radius: 1em;
+
+.panel-heading .pull-right {
+  width: 30%;
+
+  .search_box, * {
+    width: 100%;
+
+    input#keyword_search_box {
+      border-radius: 1em;
+    }
+  }
 }
+
 
 
 // Integrated button
@@ -862,6 +872,8 @@ input#keyword_search_box {
 		////////////////////////////////////////
 		// Set table and its name if Valid
 		//		var grCheckTable = new GlideRecordSecure(data.table);
+		var rec = $sp.getRecord();
+		
 		data.table = "sysevent_email_action"; // Always Notifications
 		var grCheckTable = new GlideRecord(data.table);
 		if (!data.table || !grCheckTable.isValid()) {
@@ -906,10 +918,11 @@ input#keyword_search_box {
 		var listRecords;
 		data.trigger_table_list = initializeTableChoices() || [];
 		data.hasTextIndex = $sp.hasTextIndex(data.table);
-		data.trigger_table = data.trigger_table || "Incident"; // Default if empty
+		// MAG-TODO: rewrite the trigger_table initial setting: this is just a mock-up
+		data.trigger_table = data.trigger_table || input.trigger_table || rec.getValue("collection");
 		data.filter = "collection=" + data.trigger_table;// + "^" + data.initial_filter;
 
-		/* MAG-TODO: Apply some alternative security */
+		/* MAG-TODO: Remove or Apply alternative security */
 		// FilteredGlideRecord is not supported in scoped apps, so GlideRecordSecure will always be used in an application scope
 		if (typeof FilteredGlideRecord != "undefined"
 				&& (gs.getProperty("glide.security.ui.filter") == "true"
@@ -1101,11 +1114,9 @@ input#keyword_search_box {
 		collection_groups.addNotNullQuery('collection');
 		collection_groups.addAggregate('count','collection');
 		collection_groups.groupBy('collection');
+		collection_groups.orderBy('collection');
 //		collection_groups.addActiveQuery();
 		collection_groups.addQuery("message_htmlISNOTEMPTY");// MAG-TODO: this is temp
-		//			collection_groups.addAggregate('count(distinct','collection');
-		//			collection_groups.addQuery("active", true);
-
 
 		// TODO: generate a property with all Task tables by Default:
 		/* if (!gs.getProperty("")){
@@ -1120,10 +1131,12 @@ input#keyword_search_box {
 		collection_groups.query();
 		
 		while (collection_groups.next()) {
-			if (collection_groups.getAggregate('count', 'collection') > 4) // MAG-TODO: change this joke... :)
+	var collec = new GlideRecord("sys_db_object");
+			if (collection_groups.getAggregate('count', 'collection') > 4 // MAG-TODO: change this joke... :)
+				 && collec.get("name", collection_groups.collection))
 				trigger_table_list.push({
-					value: collection_groups.getValue('collection'),
-					displayValue: collection_groups.getDisplayValue('collection') || "All" // Empty == All tables
+					value: collec.getValue("name"),
+					display_value: collec.getDisplayValue()
 				})
 		}
 		//			trigger_table_count = collection_groups.getAggregate('count(distinct','collection');
@@ -1136,14 +1149,14 @@ input#keyword_search_box {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:19:46</sys_created_on>
         <sys_id>14c96959db1010108599656b4b9619fe</sys_id>
-        <sys_mod_count>126</sys_mod_count>
+        <sys_mod_count>140</sys_mod_count>
         <sys_name>MAG Notif List View</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_14c96959db1010108599656b4b9619fe</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-06-26 00:17:44</sys_updated_on>
+        <sys_updated_on>2020-07-04 22:29:00</sys_updated_on>
         <template><![CDATA[<style>
   table #list_item_{{data.sys_id}} {
 
@@ -1185,22 +1198,17 @@ https://community.servicenow.com/community?id=community_blog&sys_id=269caee1dbd0
       </ul>
     </span>
   <!-- Glyph & Title --
-    <span class="panel-title"></span>
-      Notifications for {{data.trigger_table}}
-      <button class="btn btn-icon icon-arrow-down-triangle sn-tooltip-basic btn-default" style="font-size: 10px;">
-      </button>
+        <option value="">All</option>
 -->
     <span class="panel-title">
-      <i ng-if="options.glyph" class="fa fa-{{options.glyph}} m-r"></i>{{data.title}}
+      <i ng-if="::options.glyph" class="fa fa-{{::options.glyph}} m-r"></i>{{::data.title}}
       <select id="select_trigger_table"
               class="input_field"
               ng-model=data.trigger_table
               ng-change="changeRefreshList()" required>
-        <option value="{{data.trigger_table}}" selected>{{data.trigger_table}}</option>
         <option ng-repeat="table in data.trigger_table_list" value="{{table.value}}">
-          {{table.value}}
+          {{table.display_value}}
         </option>
-        <option value="">All</option>
       </select>
       
       
