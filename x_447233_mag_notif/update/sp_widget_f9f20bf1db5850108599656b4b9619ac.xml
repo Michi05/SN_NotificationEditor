@@ -24,7 +24,7 @@ iframe#simulated_html_iframe {
 
 
 section#contentPreviewArea {
-    background-color: rgba(235, 255, 247, 0.3);
+    background-color: rgba(235, 255, 247, 0.6);
     /* box-shadow: inset 0 0 12px 3px black; */
     box-shadow: 0 0 12px 3px black;
     padding: 1em;
@@ -43,7 +43,7 @@ section#contentPreviewArea, section#contentPreviewArea &gt; * {
   margin-right: auto;
   position: relative;
   top: -2em;
-  background-color: rgba(235, 255, 247, .3);
+  background-color: rgba(235, 255, 247, .6);
   box-shadow: 0 -5px 12px -3px black;
   padding: 0.5em;
   border-radius: 2em;
@@ -79,7 +79,7 @@ section#contentPreviewArea, section#contentPreviewArea &gt; * {
         <internal>false</internal>
         <link><![CDATA[function link(scope, element, attrs, controller) {  }]]></link>
         <name>MAG Notif Preview</name>
-        <option_schema>[{"name":"filter","section":"Data","label":"Filter preview records","type":"string"}]</option_schema>
+        <option_schema>[{"name":"preview_options_max","section":"Presentation","default_value":"40","label":"Max preview records","type":"integer"}]</option_schema>
         <public>false</public>
         <roles/>
         <script><![CDATA[// form functionality - URL parameter driven
@@ -145,9 +145,9 @@ section#contentPreviewArea, section#contentPreviewArea &gt; * {
 		
 		preview_items_gr= new GlideRecord(data.trigger_table); // as per above
 		preview_items_gr.setLimit(options.preview_options_max);
-		preview_items_gr.orderBy(preview_items_gr.getDisplayName());
+		preview_items_gr.orderByDesc(preview_items_gr.getDisplayName());
 		
-		//TODO: Or set a time-limit instead?!
+		//TODO: Or set a time-based limit instead?!
 //		preview_items_gr.orderBy(preview_items_gr.getDisplayName());
 		preview_items_gr.query();
 
@@ -164,12 +164,8 @@ section#contentPreviewArea, section#contentPreviewArea &gt; * {
 		data.preview_list = preview_items;
 		data.isTargetValid = !gs.nil(preview_items[0]); // = !gs.nil(data.preview_record);
 		if (data.isTargetValid) {
-			if (data.trigger_type == "event") {
-				data.preview_record = preview_items[0]; // Change back to 'preview_event' when it works
-			}
-			else {
-				data.preview_record = preview_items[0];
-			}
+//			if (data.trigger_type == "event") { // Change back to 'preview_event' when it works
+				data.preview_record = preview_items[0].value;
 		}
 
 
@@ -195,14 +191,14 @@ section#contentPreviewArea, section#contentPreviewArea &gt; * {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-21 18:06:30</sys_created_on>
         <sys_id>f9f20bf1db5850108599656b4b9619ac</sys_id>
-        <sys_mod_count>80</sys_mod_count>
+        <sys_mod_count>86</sys_mod_count>
         <sys_name>MAG Notif Preview</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_f9f20bf1db5850108599656b4b9619ac</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-07-04 22:22:06</sys_updated_on>
+        <sys_updated_on>2020-07-05 14:01:57</sys_updated_on>
         <template><![CDATA[<div>
   
   <!--

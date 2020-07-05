@@ -556,14 +556,14 @@ div#EditableContent {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:18:12</sys_created_on>
         <sys_id>9d696959db1010108599656b4b9619f8</sys_id>
-        <sys_mod_count>155</sys_mod_count>
+        <sys_mod_count>157</sys_mod_count>
         <sys_name>MAG Notif Form</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_9d696959db1010108599656b4b9619f8</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-07-04 11:30:33</sys_updated_on>
+        <sys_updated_on>2020-07-05 13:30:55</sys_updated_on>
         <template><![CDATA[<div>
   <!-- readOnly due to scope -->
   <div ng-if="data.f.outOfScope" class="read-only-message">
@@ -662,7 +662,7 @@ class="kb-comment-input" id="comment">
       </p>
 
       <p>
-        <span class="input_label">${️ Subject}</span>
+        <span class="input_label">${️️ Subject}</span>
         <input name="subject_field"
                id="sp_formfield_subject"
                class="form-control input_field"
@@ -713,7 +713,7 @@ Icons (emojipedia) -- ️️
           <h3 class="panel-title">
             <img class="tree" aria-hidden="true" src="images/gwt/treenode_expand_minus.gifx" alt="" style="margin-left: -16px;">
             <img alt="" aria-hidden="true" src="images/gwt/folder_open.gifx">
-            <a data-toggle="collapse" href="#collapse1">Use ticket variables</a>
+            <a data-toggle="collapse" href="#collapse1">${Use ticket variables}</a>
           </h3>
         </header>
 

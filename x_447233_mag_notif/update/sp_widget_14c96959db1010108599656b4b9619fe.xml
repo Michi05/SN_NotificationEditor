@@ -915,10 +915,12 @@ tbody tr:last-child {
 		////////////////////////////////////////
 		// Setup the GR record and the query (filters, conditions, order)
 		////////////////////////////////////////
+		
+		// MAG-TODO: rewrite all this section from scratch with understanding: there are records not being pulled or coming without proper details
+		//also the trigger_table initial setting is just a mock-up; needs re-writing too
 		var listRecords;
 		data.trigger_table_list = initializeTableChoices() || [];
 		data.hasTextIndex = $sp.hasTextIndex(data.table);
-		// MAG-TODO: rewrite the trigger_table initial setting: this is just a mock-up
 		data.trigger_table = data.trigger_table || input.trigger_table || rec.getValue("collection");
 		data.filter = "collection=" + data.trigger_table;// + "^" + data.initial_filter;
 
@@ -931,17 +933,17 @@ tbody tr:last-child {
 			listRecords.applyRowSecurity();
 		} else
 			listRecords = new GlideRecordSecure(data.table);
-		
 
-			if (data.filterACLs)
-				listRecords = $sp.addQueryString(listRecords, data.filter);
-			else
-				listRecords.addEncodedQuery(data.filter);
+
+		if (data.filterACLs)
+			listRecords = $sp.addQueryString(listRecords, data.filter);
+		else
+			listRecords.addEncodedQuery(data.filter);
 
 		//		if (data.keywords) {
-//			listRecords.addQuery('123TEXTQUERY321', data.keywords);
-//			data.keywords = null;
-//		}
+		//			listRecords.addQuery('123TEXTQUERY321', data.keywords);
+		//			data.keywords = null;
+		//		}
 
 
 
@@ -1149,14 +1151,14 @@ tbody tr:last-child {
         <sys_created_by>admin</sys_created_by>
         <sys_created_on>2020-04-19 22:19:46</sys_created_on>
         <sys_id>14c96959db1010108599656b4b9619fe</sys_id>
-        <sys_mod_count>140</sys_mod_count>
+        <sys_mod_count>141</sys_mod_count>
         <sys_name>MAG Notif List View</sys_name>
         <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
         <sys_policy/>
         <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
         <sys_update_name>sp_widget_14c96959db1010108599656b4b9619fe</sys_update_name>
         <sys_updated_by>admin</sys_updated_by>
-        <sys_updated_on>2020-07-04 22:29:00</sys_updated_on>
+        <sys_updated_on>2020-07-05 13:29:15</sys_updated_on>
         <template><![CDATA[<style>
   table #list_item_{{data.sys_id}} {
 
