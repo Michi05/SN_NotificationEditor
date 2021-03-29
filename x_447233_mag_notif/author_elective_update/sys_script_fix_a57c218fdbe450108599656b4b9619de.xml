@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="DELETE">
+        <active>true</active>
+        <before>false</before>
+        <description/>
+        <flush_cache>false</flush_cache>
+        <name>Sandbox - To be REMOVED</name>
+        <record_for_rollback>false</record_for_rollback>
+        <run_once>true</run_once>
+        <script><![CDATA[var tgt_table = "customer_contact";
+
+// var t = global.NotificationEditorUtils.getTableAncestors(tgt_table);
+// t = JSON.stringify(t);
+
+// gs.info(t);
+// gs.info(t);
+
+		var notifications_table = notifications_table || "sysevent_email_action"; // Default
+
+var collection_groups = new GlideAggregate(notifications_table);
+collection_groups.addAggregate('count');
+collection_groups.addNotNullQuery('collection');
+collection_groups.addAggregate('count','collection');
+collection_groups.groupBy('collection');
+collection_groups.query();
+
+while (collection_groups.next()) {
+	var collection = new GlideRecord("sys_db_object");
+	if (collection.get("name", collection_groups.collection))
+		gs.info(collection.getDisplayValue());
+}
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-05-07 19:19:43</sys_created_on>
+        <sys_id>a57c218fdbe450108599656b4b9619de</sys_id>
+        <sys_mod_count>36</sys_mod_count>
+        <sys_name>Sandbox - To be REMOVED</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_update_name>sys_script_fix_a57c218fdbe450108599656b4b9619de</sys_update_name>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-07-03 14:41:35</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+    <sys_update_version action="INSERT_OR_UPDATE">
+        <action>DELETE</action>
+        <application display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</application>
+        <file_path/>
+        <instance_id>ae98a3eedb5c334052cec5970596195f</instance_id>
+        <instance_name>dev76769</instance_name>
+        <name>sys_script_fix_a57c218fdbe450108599656b4b9619de</name>
+        <payload>&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;record_update table="sys_script_fix"&gt;&lt;sys_script_fix action="INSERT_OR_UPDATE"&gt;&lt;active&gt;true&lt;/active&gt;&lt;before&gt;false&lt;/before&gt;&lt;description/&gt;&lt;flush_cache&gt;false&lt;/flush_cache&gt;&lt;name&gt;Sandbox - To be REMOVED&lt;/name&gt;&lt;record_for_rollback&gt;false&lt;/record_for_rollback&gt;&lt;run_once&gt;true&lt;/run_once&gt;&lt;script&gt;&lt;![CDATA[var tgt_table = "customer_contact";
+
+// var t = global.NotificationEditorUtils.getTableAncestors(tgt_table);
+// t = JSON.stringify(t);
+
+// gs.info(t);
+// gs.info(t);
+
+		var notifications_table = notifications_table || "sysevent_email_action"; // Default
+
+var collection_groups = new GlideAggregate(notifications_table);
+collection_groups.addAggregate('count');
+collection_groups.addNotNullQuery('collection');
+collection_groups.addAggregate('count','collection');
+collection_groups.groupBy('collection');
+collection_groups.query();
+
+while (collection_groups.next()) {
+	var collection = new GlideRecord("sys_db_object");
+	if (collection.get("name", collection_groups.collection))
+		gs.info(collection.getDisplayValue());
+}
+]]&gt;&lt;/script&gt;&lt;sys_class_name&gt;sys_script_fix&lt;/sys_class_name&gt;&lt;sys_created_by&gt;admin&lt;/sys_created_by&gt;&lt;sys_created_on&gt;2020-05-07 19:19:43&lt;/sys_created_on&gt;&lt;sys_id&gt;a57c218fdbe450108599656b4b9619de&lt;/sys_id&gt;&lt;sys_mod_count&gt;36&lt;/sys_mod_count&gt;&lt;sys_name&gt;Sandbox - To be REMOVED&lt;/sys_name&gt;&lt;sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif"&gt;d546ad95db1010108599656b4b9619be&lt;/sys_package&gt;&lt;sys_policy/&gt;&lt;sys_scope display_value="MAG Notification Editor"&gt;d546ad95db1010108599656b4b9619be&lt;/sys_scope&gt;&lt;sys_update_name&gt;sys_script_fix_a57c218fdbe450108599656b4b9619de&lt;/sys_update_name&gt;&lt;sys_updated_by&gt;admin&lt;/sys_updated_by&gt;&lt;sys_updated_on&gt;2020-07-03 14:41:35&lt;/sys_updated_on&gt;&lt;unloadable&gt;false&lt;/unloadable&gt;&lt;/sys_script_fix&gt;&lt;/record_update&gt;</payload>
+        <payload_hash>-2034238372</payload_hash>
+        <record_name>Sandbox - To be REMOVED</record_name>
+        <reverted_from/>
+        <source>5142f7f1db3990108599656b4b9619a4</source>
+        <source_table>sys_update_set</source_table>
+        <state>previous</state>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-07-05 11:07:24</sys_created_on>
+        <sys_id>c6423bf1db3990108599656b4b961919</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_recorded_at>1731ea8c8dd0000001</sys_recorded_at>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2020-07-05 11:07:24</sys_updated_on>
+        <type>Fix Script</type>
+        <update_guid>0820d6d569fd1010522b83de1a6b3685</update_guid>
+        <update_guid_history>0820d6d569fd1010522b83de1a6b3685:-2034238372,7c3277f1f2399010178acc677113327c:0,ab2237f107399010c067e0cca9b73c7e:-1268281321,5d0137b1d13990104ec67267571debed:0,8001f3b113399010ea79c8c873f51c5f:-1268281321,e56601357d7190103c416e981d6fc12c:0,0c66cdf17071901083bdd9b7b72d2501:1468293328,0820d6d569fd1010522b83de1a6b3685:-2034238372,0d00d6d57afd10102bbb5370f59b0a06:1136456211,b286b5ab2d591010f80643162754d65e:-73777245,b165796b075910108e69bb6a7a7761ba:1149609125,8a33b9e7f1591010509427bd2fb587be:-1326923984,0723f9a747591010afab6dca41b9746a:1308438320,d3ee2d278e59101009a8c272a41e06d7:-1877405314,badee927bf591010da2b8d902cc325e0:-1810021003,58de6d278f5910102971e31bf6b49ecf:878663055,969577f31e6010109ac69267986c2426:-1812677911,7c5396cb5c685010779420071d351574:89503827,c1ae86c74b685010f18d40b0e33ada64:758117009,815d0a47c7685010e4c4ed083162ad7b:-1186053890,391dca47d668501031a5f004aec11733:-754117539,4d0d864fe428501002b957028bd5f492:1694368836,7eccc6873e685010f7eea13a2ea36d2f:396018480,ca6cca4725685010acc30cdaa2335156:-227205095,bdfb86475b6850108d7ade505e26b3da:-1035187361,294b0a07c1685010b0ed3a48a50a791a:-1779922927,e30b024307685010870e68a34c98e1ae:-342984983,92ea0247596850107a49c3d95d4f2c70:-1959271885,494a8e07da685010eab120147e293a50:-1074663876,371a4e833f6850107603670f16da987c:1283047740,0a8942c3526850105d9875fb0568c8e2:-1159916730,528702438f685010c9037fb8d952b151:745998220,c47742c37f68501002326964086757dd:396061510,4c074e8376685010f46c122b6b7b1371:-276747882,5b75ca4fce2850109af27bcccc654dc1:1206081845,72340243c968501011dd96984fd2874d:1456018593,d51fe98357285010532efedefefe87d4:1242780333,8cbee9832728501031f19904fd66f1e4:-2090966464,e9aee1cf9de45010fa76845ddf4dba9e:-284562208,af9eed834b28501047f59cce738b5b66:1873487299,f88ee983bb28501055bd55669d116fc5:144849866,b26e6d8326285010b9a62bcfc024b31d:-1524198121,4f4e2943e52850102041a76eeed39e5a:-1886305705,222de54383285010ec72ba43492cb1cd:-14887805</update_guid_history>
+    </sys_update_version>
+    <sys_metadata_delete action="INSERT_OR_UPDATE">
+        <sys_audit_delete/>
+        <sys_class_name>sys_metadata_delete</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-03-29 21:36:56</sys_created_on>
+        <sys_db_object display_value="" name="sys_script_fix">sys_script_fix</sys_db_object>
+        <sys_id>2766f13401fa4a33bf11d17e9bd25bb9</sys_id>
+        <sys_metadata>a57c218fdbe450108599656b4b9619de</sys_metadata>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>Sandbox - To be REMOVED</sys_name>
+        <sys_package display_value="MAG Notification Editor" source="x_447233_mag_notif">d546ad95db1010108599656b4b9619be</sys_package>
+        <sys_parent/>
+        <sys_policy/>
+        <sys_scope display_value="MAG Notification Editor">d546ad95db1010108599656b4b9619be</sys_scope>
+        <sys_scope_delete display_value="">22a1b2e2267044bc896dad3216f319e4</sys_scope_delete>
+        <sys_update_name>sys_script_fix_a57c218fdbe450108599656b4b9619de</sys_update_name>
+        <sys_update_version display_value="sys_script_fix_a57c218fdbe450108599656b4b9619de">c6423bf1db3990108599656b4b961919</sys_update_version>
+        <sys_updated_by>admin</sys_updated_by>
+        <sys_updated_on>2021-03-29 21:36:56</sys_updated_on>
+    </sys_metadata_delete>
+</record_update>

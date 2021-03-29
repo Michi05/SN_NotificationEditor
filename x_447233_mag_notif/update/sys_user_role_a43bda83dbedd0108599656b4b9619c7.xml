@@ -7,6 +7,7 @@ This includes using but not creating or updating Mail Scripts.&#13;
 &#13;
 Please note that the Notification Manager may also have access to the records related to those notifications as part of the "Preview" functionality</description>
         <elevated_privilege>false</elevated_privilege>
+        <encryption_context/>
         <grantable>true</grantable>
         <includes_roles/>
         <name>x_447233_mag_notif.Notification Manager</name>
